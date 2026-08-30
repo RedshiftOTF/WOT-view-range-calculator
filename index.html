@@ -32,6 +32,19 @@
 
   .shell { max-width: 620px; margin: 0 auto; }
 
+  /* Two columns once there's room; a single stack on narrow screens. */
+  .columns {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0 1.25rem;
+    align-items: start;
+  }
+
+  @media (min-width: 900px) {
+    .shell { max-width: 1180px; }
+    .columns { grid-template-columns: 1fr 1fr; }
+  }
+
   h1 {
     font-family: 'Oswald', sans-serif;
     font-weight: 600;
@@ -226,27 +239,32 @@
   }
 
   .readout-spot .readout-value { color: var(--warn); }
+  .readout-spot #result { color: var(--optic); }
 
+  /* Equal columns keep the three figures on a shared baseline. */
   .spot-pair {
-    display: flex;
-    gap: 1.5rem;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    align-items: end;
+    gap: 1rem;
     width: 100%;
   }
 
-  .spot-case { flex: 1 1 10rem; }
+  .spot-case { min-width: 0; }
 
-  .spot-case .readout-label { display: block; margin-bottom: 0.35rem; }
+  .spot-case .readout-value { font-size: 2.4rem; }
 
-  .raw-value {
-    display: block;
-    font-family: 'Barlow Semi Condensed', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 400;
-    letter-spacing: 0;
-    color: var(--text-dim);
-    margin-top: 0.25rem;
+  @media (max-width: 480px) {
+    .spot-pair { grid-template-columns: 1fr; }
   }
+
+  .spot-case .readout-label {
+    display: block;
+    margin-bottom: 0.4rem;
+    min-height: 2.2em;
+  }
+
+  .spot-case .readout-value { display: block; }
 
   input[type="number"]#camo,
   input[type="number"]#foliage { width: 7rem; }
@@ -263,6 +281,18 @@
   }
 
   .cvs-total b { color: var(--optic); font-weight: 500; }
+
+  .worse { color: #c9584f; }
+  .better { color: var(--optic); }
+
+  .credit {
+    font-family: 'Barlow Semi Condensed', sans-serif;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    text-align: center;
+    margin: 2rem 0 0;
+    opacity: 0.7;
+  }
 
   .footnote {
     font-family: 'Barlow Semi Condensed', sans-serif;
@@ -316,6 +346,9 @@
 
   .breakdown b { color: var(--text); font-weight: 500; }
 
+  #cvsSummary { padding-top: 0.75rem; }
+  #spotBreakdown { border-top: none; padding-top: 0.35rem; margin-top: 0; }
+
   .msg {
     color: var(--warn);
     font-family: 'Barlow Semi Condensed', sans-serif;
@@ -343,6 +376,8 @@
     </div>
   </div>
 
+  <div class="columns">
+    <div class="column">
   <div class="panel">
     <h2>Commander qualification percentage</h2>
     <div id="crewBonuses"><p class="msg">Loading settings…</p></div>
@@ -358,20 +393,22 @@
     <div id="flatBonuses"></div>
   </div>
 
+    </div>
+
+    <div class="column">
   <div class="panel">
     <h2>Crew Skills that add View Range percentage</h2>
     <div id="skills"></div>
   </div>
 
-  <div class="readout">
-    <span class="readout-label">View range</span>
-    <span class="readout-value" id="result">—</span>
-    <div class="breakdown" id="breakdown"></div>
-  </div>
-
   <div class="panel">
     <h2>Commander's Vision System bonuses</h2>
     <div id="cvs"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Vehicle modes</h2>
+    <div id="combinedModes"></div>
   </div>
 
   <div class="panel">
@@ -390,16 +427,25 @@
   <div class="readout readout-spot">
     <div class="spot-pair">
       <div class="spot-case">
-        <span class="readout-label">Spot them within — stationary</span>
+        <span class="readout-label">View range</span>
+        <span class="readout-value" id="result">—</span>
+      </div>
+      <div class="spot-case">
+        <span class="readout-label">Spot within — stationary</span>
         <span class="readout-value" id="spotStill">—</span>
       </div>
       <div class="spot-case">
-        <span class="readout-label">Spot them within — moving</span>
+        <span class="readout-label">Spot within — moving</span>
         <span class="readout-value" id="spotMove">—</span>
       </div>
     </div>
+    <div class="breakdown" id="cvsSummary"></div>
     <div class="breakdown" id="spotBreakdown"></div>
   </div>
+    </div>
+  </div>
+
+  <p class="credit">Made by RedshiftOTF</p>
 
 </div>
 
@@ -421,7 +467,7 @@ const CONFIG = {
       "id": "bia",
       "name": "Brothers in Arms",
       "value": 5,
-      "note": "Whole crew must have it trained"
+      "note": "All crew members trained to 100%"
     },
     {
       "id": "vents",
@@ -643,13 +689,15 @@ const CONFIG = {
         "id": "panoramicTriplex",
         "name": "Panoramic Triplex",
         "moving": 0.97,
-        "foliage": 1.03
+        "foliage": 1.03,
+        "note": "Certain tier 10 tanks only"
       },
       {
         "id": "narrowAngle",
         "name": "Narrow Angle Observation Device",
         "moving": 1.03,
-        "foliage": 0.97
+        "foliage": 0.97,
+        "note": "Certain tier 10 tanks only"
       }
     ],
     "_fieldModNote": "These field mods trade concealment reduction between the two conditions and can be fitted without the CVS equipment. Their effect ADDS to the equipment's rather than multiplying: CVS (-10% moving) with Panoramic Triplex (-3%) gives -13%. UNVERIFIED against the game.",
@@ -670,7 +718,18 @@ const CONFIG = {
       }
     ],
     "_upgradeNote": "Tier 11 vehicles take upgrades instead of field mods. Each affects only one of the two conditions, and stacks additively with the equipment and field mod like everything else in this section."
-  }
+  },
+  "combinedModes": [
+    {
+      "id": "irst",
+      "name": "IRST mode (WZ-219)",
+      "percent": 30,
+      "moving": 0.825,
+      "foliage": 0.6,
+      "note": "Tier 11 - fully upgraded, narrowest beam"
+    }
+  ],
+  "_combinedModeNote": "Vehicle modes that act on both sides of the calculation at once: a view range multiplier like a field mod, plus CVS-style concealment reduction. UNVERIFIED against the game."
 };
 // ---------------------------------------------------------------------------
 
@@ -679,6 +738,7 @@ function init() {
   renderConditional();
   renderSkills();
   renderFlat();
+  renderModes();
   renderCVS();
   ['baseVR', 'camo', 'foliage'].forEach(id =>
     wireNumberField(document.getElementById(id)));
@@ -707,10 +767,12 @@ function clearSlotConflicts(justChanged) {
 function resetSelections() {
   renderBonuses();
   renderConditional();
+  renderModes();
   renderCVS();
   renderConditional();
   renderSkills();
   renderFlat();
+  renderModes();
   renderCVS();
   calculate();
 }
@@ -725,15 +787,44 @@ function resetSelections() {
 // otherwise an empty box stalls the calculation.
 // CVS reduces the enemy's concealment rather than boosting your view range,
 // and it treats the tank's own camo separately from the foliage.
+// Vehicle-specific modes. These behave like a view range field mod - an
+// undamped multiplier, not scaled by commander qualification.
+function renderModes() {
+  const box = document.getElementById('combinedModes');
+  box.innerHTML = '';
+  const pct = m => {
+    const p = +((1 - m) * 100).toFixed(2);
+    return (p >= 0 ? '\u2212' : '+') + Math.abs(p) + '%';
+  };
+  CONFIG.combinedModes.forEach(m => {
+    const label = document.createElement('label');
+    label.className = 'toggle';
+    const bits = [`+${m.percent}% view range`];
+    if (m.moving !== 1) bits.push(`${pct(m.moving)} moving`);
+    if (m.foliage !== 1) bits.push(`${pct(m.foliage)} foliage`);
+    label.innerHTML = `
+      <input type="checkbox" data-mode="${m.id}" data-percent="${m.percent}"
+             data-moving="${m.moving}" data-foliage="${m.foliage}">
+      <span class="toggle-name">${m.name}${m.note ? `<span class="toggle-note">${m.note}</span>` : ''}</span>
+      <span class="toggle-val">${bits.join('<br>')}</span>`;
+    label.querySelector('input').addEventListener('change', calculate);
+    box.appendChild(label);
+  });
+}
+
 function renderCVS() {
   const box = document.getElementById('cvs');
   box.innerHTML = '';
 
   // Reductions read more naturally as percentages than as raw multipliers,
   // and these mods can push a value up as well as down.
-  const label = m => {
+  // A positive value means the enemy gets MORE concealment, so flag the whole
+  // phrase red rather than just the number.
+  const label = (m, word) => {
     const p = +((1 - m) * 100).toFixed(2);
-    return (p >= 0 ? '\u2212' : '+') + Math.abs(p) + '%';
+    const text = (p >= 0 ? '\u2212' : '+') + Math.abs(p) + '%'
+      + (word ? ' ' + word : '');
+    return p < 0 ? `<span class="worse">${text}</span>` : text;
   };
 
   const buildGroup = (options, groupName) => {
@@ -743,13 +834,13 @@ function renderCVS() {
       const row = document.createElement('label');
       row.className = 'toggle';
       const effect = (o.moving !== 1 || o.foliage !== 1)
-        ? `${label(o.moving)} moving &amp; ${label(o.foliage)} foliage`
+        ? `${label(o.moving, 'moving')} &amp; ${label(o.foliage, 'foliage')}`
         : '';
       row.innerHTML = `
         <input type="radio" name="${groupName}" data-cvs="${o.id}"
                data-moving="${o.moving}" data-foliage="${o.foliage}"
                ${i === 0 ? 'checked' : ''}>
-        <span class="toggle-name">${o.name}</span>
+        <span class="toggle-name">${o.name}${o.note ? `<span class="toggle-note">${o.note}</span>` : ''}</span>
         <span class="toggle-val">${effect}</span>`;
       row.querySelector('input').addEventListener('change', () => {
         // Field mods and tier 11 upgrades are alternatives, so picking a real
@@ -781,9 +872,10 @@ function renderCVS() {
     CONFIG.cvs.upgrades.forEach(o => {
       const row = document.createElement('label');
       row.className = 'toggle';
-      const effect = o.moving !== 1
-        ? `${label(o.moving)} moving`
-        : `${label(o.foliage)} foliage`;
+      const parts = [];
+      if (o.moving !== 1) parts.push(label(o.moving, 'moving'));
+      if (o.foliage !== 1) parts.push(label(o.foliage, 'foliage'));
+      const effect = parts.join(' &amp; ');
       row.innerHTML = `
         <input type="checkbox" data-cvs-upgrade="${o.id}"
                data-moving="${o.moving}" data-foliage="${o.foliage}">
@@ -814,8 +906,13 @@ function wireNumberField(field, emptyValue = 0) {
   field.addEventListener('focus', () => field.select());
   field.addEventListener('click', () => field.select());
   field.addEventListener('blur', () => {
-    if (field.value.trim() === '' || !isFinite(parseFloat(field.value))) {
+    const v = parseFloat(field.value);
+    if (field.value.trim() === '' || !isFinite(v)) {
       field.value = emptyValue;
+      calculate();
+    } else if (v < 0) {
+      // Negative bonuses aren't a thing - pull it back to zero.
+      field.value = 0;
       calculate();
     }
   });
@@ -857,23 +954,41 @@ function calculateSpotting(vr) {
   // CVS (-10% moving) with Panoramic Triplex (-3%) gives -13%, not -12.7%.
   const cvs = document.querySelector('input[name="cvs"]:checked');
   const cvsMod = document.querySelector('input[name="cvsFieldMod"]:checked');
-  const upgrades = [...document.querySelectorAll('input[data-cvs-upgrade]:checked')];
+  const upgrades = [
+    ...document.querySelectorAll('input[data-cvs-upgrade]:checked'),
+    ...document.querySelectorAll('#combinedModes input:checked')
+  ];
   const reduction = (el, key) => el ? 1 - parseFloat(el.dataset[key]) : 0;
   const sum = key => reduction(cvs, key) + reduction(cvsMod, key)
     + upgrades.reduce((t, el) => t + reduction(el, key), 0);
   const mMul = 1 - sum('moving');
   const fMul = 1 - sum('foliage');
 
+  // Green when the enemy loses concealment, red when they gain it.
+  const pc = (v, tail) => {
+    const p = +((1 - v) * 100).toFixed(2);
+    const text = (p >= 0 ? '\u2212' : '+') + Math.abs(p) + '%'
+      + (tail ? ' ' + tail : '');
+    if (p === 0) return text;
+    return `<span class="${p > 0 ? 'better' : 'worse'}">${text}</span>`;
+  };
+  const none = mMul === 1 && fMul === 1;
+
   const totalBox = document.getElementById('cvsTotal');
   if (totalBox) {
-    const pc = v => {
-      const p = +((1 - v) * 100).toFixed(2);
-      return (p >= 0 ? '\u2212' : '+') + Math.abs(p) + '%';
-    };
-    totalBox.innerHTML = (mMul === 1 && fMul === 1)
+    totalBox.innerHTML = none
       ? 'No concealment reduction'
-      : `Total <b>${pc(mMul)}</b> camo from moving vehicles \u00b7 `
-        + `<b>${pc(fMul)}</b> camo from vehicles behind foliage`;
+      : `Total ${pc(mMul, 'camo from moving vehicles')} \u00b7 `
+        + `${pc(fMul, 'camo from vehicles behind foliage')}`;
+  }
+
+  // Repeat the CVS totals on the view range panel so both halves of the
+  // build can be read from one place.
+  const cvsSummary = document.getElementById('cvsSummary');
+  if (cvsSummary) {
+    cvsSummary.innerHTML = none
+      ? 'No CVS bonuses'
+      : `CVS bonuses ${pc(mMul, 'camo moving')} \u00b7 ${pc(fMul, 'camo behind foliage')}`;
   }
 
   const foliageEff = foliage * fMul;
@@ -881,16 +996,14 @@ function calculateSpotting(vr) {
   const totalMove = (camo * mMul) + foliageEff;
 
   // The formula can run past both ends of the game's spotting window, so the
-  // headline figure is clamped and the raw result shown underneath it.
+  // figure is clamped to the 50-445m range the game actually uses.
   const distance = total => {
     const raw = vr - ((vr - sp.minimumSpot) * total / 100);
-    const shown = Math.min(Math.max(raw, sp.minimumSpot), sp.hardCap);
-    return { raw, shown, clamped: Math.abs(raw - shown) > 0.005 };
+    return Math.min(Math.max(raw, sp.minimumSpot), sp.hardCap);
   };
 
-  const render = (el, r) => {
-    el.innerHTML = r.shown.toFixed(2) + '<span> m</span>'
-      + (r.clamped ? `<span class="raw-value">formula gives ${r.raw.toFixed(2)} m</span>` : '');
+  const render = (el, value) => {
+    el.innerHTML = value.toFixed(2) + '<span> m</span>';
   };
 
   const a = distance(totalStill);
@@ -898,24 +1011,9 @@ function calculateSpotting(vr) {
   render(still, a);
   render(move, b);
 
-  const cvsActive = mMul !== 1 || fMul !== 1;
-
-  let notes = `Concealment <b>${+totalStill.toFixed(2)}%</b> stationary, `
-            + `<b>${+totalMove.toFixed(2)}%</b> moving`
-            + ` \u00b7 against <b>${vr.toFixed(2)} m</b> view range`;
-
-  if (cvsActive) {
-    const bits = [];
-    if (foliage > 0 && fMul !== 1) {
-      bits.push(`bush <b>${foliage}% \u2192 ${+foliageEff.toFixed(2)}%</b> either way`);
-    }
-    if (camo > 0 && mMul !== 1) {
-      bits.push(`tank <b>${camo}% \u2192 ${+(camo * mMul).toFixed(2)}%</b> once moving`);
-    }
-    if (bits.length) notes += `<br>CVS changes ` + bits.join(' \u00b7 ');
-  }
-  notes += '<br><span class="msg">Spotting model not yet verified against the game.</span>';
-  bd.innerHTML = notes;
+  bd.innerHTML = `Concealment <b>${+totalStill.toFixed(2)}%</b> stationary, `
+               + `<b>${+totalMove.toFixed(2)}%</b> moving`
+               + ` \u00b7 against <b>${vr.toFixed(2)} m</b> view range`;
 }
 
 function renderConditional() {
@@ -1070,11 +1168,11 @@ function renderBonuses() {
 function calculate() {
   const base = parseFloat(document.getElementById('baseVR').value);
   const out = document.getElementById('result');
-  const bd = document.getElementById('breakdown');
 
   if (!isFinite(base) || base <= 0) {
     out.textContent = '—';
-    bd.innerHTML = '<span class="msg">Enter a base view range to see a result.</span>';
+    const note = document.getElementById('cvsSummary');
+    if (note) note.innerHTML = '<span class="msg">Enter a base view range to see a result.</span>';
     return;
   }
 
@@ -1158,7 +1256,17 @@ function calculate() {
   document.querySelectorAll('#flatBonuses input[data-flat]:checked').forEach(chk => {
     const row = chk.closest('.toggle');
     const field = row.querySelector('.pct-input');
-    const p = field ? parseFloat(field.value) : parseFloat(chk.dataset.percent);
+    let p = field ? parseFloat(field.value) : parseFloat(chk.dataset.percent);
+    if (isFinite(p) && p < 0) p = 0;   // never let a negative bonus through
+    if (isFinite(p) && p !== 0) {
+      vr *= (1 + p / 100);
+      flats.push(p);
+    }
+  });
+
+  // Vehicle modes multiply like the flat bonuses, undamped.
+  document.querySelectorAll('#combinedModes input:checked').forEach(chk => {
+    const p = parseFloat(chk.dataset.percent);
     if (isFinite(p) && p !== 0) {
       vr *= (1 + p / 100);
       flats.push(p);
@@ -1169,14 +1277,14 @@ function calculate() {
 
   out.innerHTML = vr.toFixed(2) + '<span> m</span>';
   calculateSpotting(vr);
-  bd.innerHTML = `Commander effective <b>${+C.toFixed(3)}%</b> · multiplier <b>×${multiplier.toFixed(4)}</b>`
-    + (conds.length ? ` · situational <b>${conds.map(p => '+' + p).join(' · ')}</b>` : '')
-    + (skills.length ? ` · skills <b>${skills.map(p => '+' + p + '%').join(' · ')}</b>` : '')
-    + (flats.length ? ` · bonuses <b>${flats.map(p => '+' + p + '%').join(' · ')}</b>` : '')
-    + (gain > 0.005 ? ` · <b>+${gain.toFixed(2)} m</b> over base` : '');
+
 }
 
 init();
 </script>
+
+<!-- GoatCounter analytics -->
+<script data-goatcounter="https://reshiftotf.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
