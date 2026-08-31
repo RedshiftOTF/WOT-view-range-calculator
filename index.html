@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>View Range Calculator — World of Tanks</title>
+<title>World of Tanks View Range Calculator</title>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -58,8 +58,10 @@
     font-family: 'Barlow Semi Condensed', sans-serif;
     color: var(--text-dim);
     font-size: 0.95rem;
-    margin: 0 0 2rem;
+    margin: 0.9rem 0 0;
   }
+
+  h1 + .panel { margin-top: 1.5rem; }
 
   .panel {
     background: var(--steel);
@@ -217,11 +219,11 @@
 
   #resetBtn {
     flex: 1 1 12rem;
-    background: transparent;
+    background: var(--plate);
     border: 1px solid var(--steel-line);
     color: var(--text-dim);
     font-family: 'Oswald', sans-serif;
-    font-size: 0.75rem;
+    font-size: 1.125rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     padding: 0 0.9rem;
@@ -362,8 +364,7 @@
 <body>
 <div class="shell">
 
-  <h1>View Range Calculator</h1>
-  <p class="sub">Base commander assumed to be at 100% major qualification.</p>
+  <h1>World of Tanks View Range Calculator</h1>
 
   <div class="panel">
     <h2>Vehicle</h2>
@@ -374,6 +375,7 @@
       </label>
       <button type="button" id="resetBtn">Clear all selections below</button>
     </div>
+    <p class="sub">Base commander assumed to be at 100% major qualification.</p>
   </div>
 
   <div class="columns">
@@ -384,7 +386,7 @@
   </div>
 
   <div class="panel">
-    <h2>Crew skills that add to Commander qualification percentage</h2>
+    <h2>Situational crew skills that add to Commander qualification percentage</h2>
     <div id="conditionalSkills"></div>
   </div>
 
@@ -445,7 +447,7 @@
     </div>
   </div>
 
-  <p class="credit">Made by RedshiftOTF</p>
+  <p class="credit">Made by RedshiftOTF<br>v1.0.1</p>
 
 </div>
 
@@ -722,7 +724,7 @@ const CONFIG = {
   "combinedModes": [
     {
       "id": "irst",
-      "name": "IRST mode (WZ-219)",
+      "name": "IRST mode (WZ-219) - Experimental!",
       "percent": 30,
       "moving": 0.825,
       "foliage": 0.6,
