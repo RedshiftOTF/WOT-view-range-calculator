@@ -153,6 +153,14 @@
 
   .toggle-name { flex: 1; }
 
+  .toggle-icon {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    border-radius: 2px;
+    object-fit: contain;
+  }
+
   .toggle-note {
     display: block;
     font-family: 'Barlow Semi Condensed', sans-serif;
@@ -273,6 +281,17 @@
 
   .panel .field + .field { margin-top: 0.9rem; }
 
+  /* The two concealment inputs sit side by side, stacking when space is tight. */
+  .conceal-row {
+    display: flex;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+  }
+
+  .conceal-row .field { flex: 1 1 12rem; }
+  .conceal-row .field + .field { margin-top: 0; }
+  .conceal-row .field-label { min-height: 2.6em; }
+
   .cvs-total {
     font-family: 'Barlow Semi Condensed', sans-serif;
     font-size: 0.9rem;
@@ -286,6 +305,19 @@
 
   .worse { color: #c9584f; }
   .better { color: var(--optic); }
+
+  .disclaimer {
+    font-family: 'Barlow Semi Condensed', sans-serif;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--text-dim);
+    text-align: center;
+    margin: 0.75rem 0 0;
+    opacity: 0.6;
+  }
+
+  .disclaimer a { color: inherit; text-decoration: underline; }
+  .disclaimer a:hover { color: var(--text); }
 
   .credit {
     font-family: 'Barlow Semi Condensed', sans-serif;
@@ -415,14 +447,16 @@
 
   <div class="panel">
     <h2>Enemy concealment</h2>
-    <label class="field">
-      <span class="field-label">Total Enemy tank's camouflage value (%)</span>
-      <input type="number" id="camo" value="30" min="0" max="100" step="0.1" inputmode="decimal">
-    </label>
-    <label class="field">
-      <span class="field-label">Total foliage / bush camouflage (%)</span>
-      <input type="number" id="foliage" value="0" min="0" max="80" step="0.1" inputmode="decimal">
-    </label>
+    <div class="conceal-row">
+      <label class="field">
+        <span class="field-label">Total Enemy tank's camouflage value (%)</span>
+        <input type="number" id="camo" value="30" min="0" max="100" step="0.1" inputmode="decimal">
+      </label>
+      <label class="field">
+        <span class="field-label">Total foliage / bush camouflage (%)</span>
+        <input type="number" id="foliage" value="0" min="0" max="80" step="0.1" inputmode="decimal">
+      </label>
+    </div>
     <p class="footnote">Assumes light and heavy bushes give 25 and 50% camo. Multiple bushes stack but don't exceed 80%</p>
   </div>
 
@@ -433,11 +467,11 @@
         <span class="readout-value" id="result">—</span>
       </div>
       <div class="spot-case">
-        <span class="readout-label">Spot within — stationary</span>
+        <span class="readout-label">Stationary Enemy<br>Spot within</span>
         <span class="readout-value" id="spotStill">—</span>
       </div>
       <div class="spot-case">
-        <span class="readout-label">Spot within — moving</span>
+        <span class="readout-label">Moving Enemy<br>Spot within</span>
         <span class="readout-value" id="spotMove">—</span>
       </div>
     </div>
@@ -447,13 +481,18 @@
     </div>
   </div>
 
-  <p class="credit">Made by RedshiftOTF<br>v1.0.1</p>
+  <p class="credit">Made by RedshiftOTF<br>v1.1</p>
+
+  <p class="disclaimer">This is not an official Wargaming or World of Tanks website.
+    All images belong to <a href="https://Wargaming.net" target="_blank" rel="noopener">Wargaming.net</a><br>
+    World of Tanks is a trademark of <a href="http://www.wargaming.net" target="_blank" rel="noopener">Wargaming.net</a></p>
 
 </div>
 
 <script>
 // ---------------------------------------------------------------------------
 //  SETTINGS - edit the numbers below after a game patch.
+//  Icons are loaded from the images/ folder next to this file.
 // ---------------------------------------------------------------------------
 const CONFIG = {
   "_comment": "View range constants for World of Tanks. Values derived from tanks.gg and in-game comparison-tool measurements. Edit this file after a patch; index.html does not need changing.",
@@ -507,7 +546,7 @@ const CONFIG = {
     },
     {
       "id": "food",
-      "name": "Food / consumable",
+      "name": "Food Consumable",
       "value": 10
     }
   ],
@@ -731,7 +770,40 @@ const CONFIG = {
       "note": "Tier 11 - fully upgraded, narrowest beam"
     }
   ],
-  "_combinedModeNote": "Vehicle modes that act on both sides of the calculation at once: a view range multiplier like a field mod, plus CVS-style concealment reduction. UNVERIFIED against the game."
+  "_combinedModeNote": "Vehicle modes that act on both sides of the calculation at once: a view range multiplier like a field mod, plus CVS-style concealment reduction. UNVERIFIED against the game.",
+  "icons": {
+    "bia": "images/bia.png",
+    "binocs": "images/binocs.png",
+    "binocsSlot": "images/binocsSlot.png",
+    "bondBinocs": "images/bondBinocs.png",
+    "bondOptics": "images/bondOptics.png",
+    "bondVents": "images/bondVents.png",
+    "bountyOptics": "images/bountyOptics.png",
+    "bountyVents": "images/bountyVents.png",
+    "bulletproof": "images/bulletproof.png",
+    "communicationsExpert": "images/communicationsExpert.png",
+    "cvsSlot": "images/cvsSlot.png",
+    "cvsStandard": "images/cvsStandard.png",
+    "emergency": "images/emergency.png",
+    "fieldMod": "images/fieldMod.png",
+    "food": "images/food.png",
+    "holdTheLine": "images/holdTheLine.png",
+    "narrowAngle": "images/narrowAngle.png",
+    "opticalCalibration": "images/opticalCalibration.png",
+    "optics": "images/optics.png",
+    "opticsSlot": "images/opticsSlot.png",
+    "panoramicTriplex": "images/panoramicTriplex.png",
+    "recon": "images/recon.png",
+    "sideBySide": "images/sideBySide.png",
+    "situationalAwareness": "images/situationalAwareness.png",
+    "spotBonusFoliage": "images/spotBonusFoliage.png",
+    "spotBonusMovement": "images/spotBonusMovement.png",
+    "staySharp": "images/staySharp.png",
+    "threatSearch": "images/threatSearch.png",
+    "ventPurge": "images/ventPurge.png",
+    "vents": "images/vents.png",
+    "ventsSlot": "images/ventsSlot.png"
+  }
 };
 // ---------------------------------------------------------------------------
 
@@ -791,6 +863,12 @@ function resetSelections() {
 // and it treats the tank's own camo separately from the foliage.
 // Vehicle-specific modes. These behave like a view range field mod - an
 // undamped multiplier, not scaled by commander qualification.
+// Optional per-option artwork. Rows without an image are unchanged.
+function iconFor(id) {
+  const src = (CONFIG.icons || {})[id];
+  return src ? `<img class="toggle-icon" src="${src}" alt="">` : '';
+}
+
 function renderModes() {
   const box = document.getElementById('combinedModes');
   box.innerHTML = '';
@@ -842,6 +920,7 @@ function renderCVS() {
         <input type="radio" name="${groupName}" data-cvs="${o.id}"
                data-moving="${o.moving}" data-foliage="${o.foliage}"
                ${i === 0 ? 'checked' : ''}>
+        ${iconFor(o.id)}
         <span class="toggle-name">${o.name}${o.note ? `<span class="toggle-note">${o.note}</span>` : ''}</span>
         <span class="toggle-val">${effect}</span>`;
       row.querySelector('input').addEventListener('change', () => {
@@ -881,6 +960,7 @@ function renderCVS() {
       row.innerHTML = `
         <input type="checkbox" data-cvs-upgrade="${o.id}"
                data-moving="${o.moving}" data-foliage="${o.foliage}">
+        ${iconFor(o.id)}
         <span class="toggle-name">${o.name}${o.note ? `<span class="toggle-note">${o.note}</span>` : ''}</span>
         <span class="toggle-val">${effect}</span>`;
       row.querySelector('input').addEventListener('change', e => {
@@ -1013,7 +1093,7 @@ function calculateSpotting(vr) {
   render(still, a);
   render(move, b);
 
-  bd.innerHTML = `Concealment <b>${+totalStill.toFixed(2)}%</b> stationary, `
+  bd.innerHTML = `New Enemy Concealment  = <b>${+totalStill.toFixed(2)}%</b> stationary &amp; `
                + `<b>${+totalMove.toFixed(2)}%</b> moving`
                + ` \u00b7 against <b>${vr.toFixed(2)} m</b> view range`;
 }
@@ -1026,6 +1106,7 @@ function renderConditional() {
     label.className = 'toggle';
     label.innerHTML = `
       <input type="checkbox" data-cond="${s.id}" data-percent="${s.percent}">
+      ${iconFor(s.id)}
       <span class="toggle-name">${s.name}${s.note ? `<span class="toggle-note">${s.note}</span>` : ''}</span>
       <span class="toggle-val" data-cond-val="${s.id}">+${s.percent}</span>`;
     label.querySelector('input').addEventListener('change', calculate);
@@ -1048,6 +1129,7 @@ function renderSkills() {
     label.className = 'toggle';
     label.innerHTML = `
       <input type="checkbox" data-skill="${s.id}" data-percent="${s.percent}">
+      ${iconFor(s.id)}
       <span class="toggle-name">${s.name}${s.note ? `<span class="toggle-note">${s.note}</span>` : ''}</span>
       <span class="toggle-val" data-skill-val="${s.id}">+${s.percent}%</span>`;
     label.querySelector('input').addEventListener('change', calculate);
@@ -1066,6 +1148,7 @@ function renderFlat() {
       <input type="${type}" data-flat="${b.id}" data-percent="${b.percent}"
              ${b.slot ? `data-slot="${b.slot}"` : ''}
              ${groupName ? `name="flat-${groupName}"` : ''} ${checked ? 'checked' : ''}>
+      ${iconFor(b.id)}
       <span class="toggle-name">${b.name}${b.note ? `<span class="toggle-note">${b.note}</span>` : ''}</span>
       ${b.userEditable
         ? `<span class="pct"><input type="number" class="pct-input" value="${b.percent}"
@@ -1131,6 +1214,7 @@ function renderBonuses() {
       <input type="${type}" data-value="${b.value}" data-id="${b.id}"
              ${b.slot ? `data-slot="${b.slot}"` : ''}
              ${groupName ? `name="${groupName}"` : ''} ${checked ? 'checked' : ''}>
+      ${iconFor(b.id)}
       <span class="toggle-name">${b.name}${b.note ? `<span class="toggle-note">${b.note}</span>` : ''}</span>
       <span class="toggle-val">${b.value ? '+' + b.value : ''}</span>`;
     const control = label.querySelector('input');
