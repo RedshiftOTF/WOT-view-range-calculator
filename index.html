@@ -277,20 +277,40 @@
   .spot-case .readout-value { display: block; }
 
   input[type="number"]#camo,
-  input[type="number"]#foliage { width: 7rem; }
+  input[type="number"]#foliage { width: 100%; max-width: 7rem; }
 
   .panel .field + .field { margin-top: 0.9rem; }
 
   /* The two concealment inputs sit side by side, stacking when space is tight. */
   .conceal-row {
     display: flex;
-    gap: 1.25rem;
+    gap: 1rem;
     flex-wrap: wrap;
+    align-items: flex-start;
   }
 
-  .conceal-row .field { flex: 1 1 12rem; }
+  /* The two inputs share the space; the total takes only what it needs. */
+  .conceal-row .field { flex: 1 1 7rem; min-width: 0; }
+  .conceal-row .conceal-total { flex: 0 1 auto; }
   .conceal-row .field + .field { margin-top: 0; }
-  .conceal-row .field-label { min-height: 2.6em; }
+  .conceal-row .field-label { min-height: 3.2em; }
+
+  .conceal-row input[type="number"] { width: 100%; }
+
+  @media (max-width: 420px) {
+    .conceal-row .field { flex: 1 1 100%; }
+  }
+
+  .conceal-total { text-align: center; }
+
+  .conceal-total-value {
+    display: block;
+    font-family: 'Oswald', sans-serif;
+    font-size: 2.25rem;
+    color: var(--optic);
+    line-height: 1;
+    padding: 0.35rem 0;
+  }
 
   .cvs-total {
     font-family: 'Barlow Semi Condensed', sans-serif;
@@ -455,13 +475,17 @@
     <h2>Enemy concealment</h2>
     <div class="conceal-row">
       <label class="field">
-        <span class="field-label">Total Enemy tank's camouflage value (%)</span>
+        <span class="field-label">Total Enemy tank's camouflage (%)</span>
         <input type="number" id="camo" value="30" min="0" max="100" step="0.1" inputmode="decimal">
       </label>
       <label class="field">
         <span class="field-label">Total foliage / bush camouflage (%)</span>
         <input type="number" id="foliage" value="0" min="0" max="80" step="0.1" inputmode="decimal">
       </label>
+      <div class="field conceal-total">
+        <span class="field-label">Combined enemy camouflage</span>
+        <span class="conceal-total-value" id="camoTotal">—</span>
+      </div>
     </div>
     <p class="footnote">Assumes light and heavy bushes give 25 and 50% camo. Multiple bushes stack but don't exceed 80%</p>
   </div>
@@ -1056,6 +1080,8 @@ function calculateSpotting(vr) {
   if (!isFinite(camo) || camo < 0 || !isFinite(foliage) || foliage < 0) {
     still.textContent = '\u2014';
     move.textContent = '\u2014';
+    const box = document.getElementById('camoTotal');
+    if (box) box.textContent = '\u2014';
     bd.innerHTML = '<span class="msg">Enter camouflage values between 0 and 100.</span>';
     return;
   }
@@ -1108,6 +1134,10 @@ function calculateSpotting(vr) {
   const foliageEff = foliage * fMul;
   const totalStill = camo + foliageEff;
   const totalMove = (camo * mMul) + foliageEff;
+
+  // Raw combined figure, before CVS acts on it.
+  const camoTotalBox = document.getElementById('camoTotal');
+  if (camoTotalBox) camoTotalBox.textContent = (+(camo + foliage).toFixed(2)) + '%';
 
   // The formula can run past both ends of the game's spotting window, so the
   // figure is clamped to the 50-445m range the game actually uses.
