@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>World of Tanks View Range Calculator</title>
+<title>World of Tanks View Range and Spotting Distance Calculator</title>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -381,7 +381,13 @@
   .breakdown b { color: var(--text); font-weight: 500; }
 
   #cvsSummary { padding-top: 0.75rem; }
+  #qualSummary,
   #spotBreakdown { border-top: none; padding-top: 0.35rem; margin-top: 0; }
+
+  .qual-note {
+    font-size: 0.85em;
+    opacity: 0.75;
+  }
 
   .msg {
     color: var(--warn);
@@ -396,7 +402,7 @@
 <body>
 <div class="shell">
 
-  <h1>World of Tanks View Range Calculator</h1>
+  <h1>World of Tanks View Range and Spotting Distance Calculator</h1>
 
   <div class="panel">
     <h2>Vehicle</h2>
@@ -476,12 +482,13 @@
       </div>
     </div>
     <div class="breakdown" id="cvsSummary"></div>
+    <div class="breakdown" id="qualSummary"></div>
     <div class="breakdown" id="spotBreakdown"></div>
   </div>
     </div>
   </div>
 
-  <p class="credit">Made by RedshiftOTF<br>v1.1</p>
+  <p class="credit">Made by RedshiftOTF<br>v1.1.1</p>
 
   <p class="disclaimer">This is not an official Wargaming or World of Tanks website.
     All images belong to <a href="https://Wargaming.net" target="_blank" rel="noopener">Wargaming.net</a><br>
@@ -492,7 +499,6 @@
 <script>
 // ---------------------------------------------------------------------------
 //  SETTINGS - edit the numbers below after a game patch.
-//  Icons are loaded from the images/ folder next to this file.
 // ---------------------------------------------------------------------------
 const CONFIG = {
   "_comment": "View range constants for World of Tanks. Values derived from tanks.gg and in-game comparison-tool measurements. Edit this file after a patch; index.html does not need changing.",
@@ -762,15 +768,26 @@ const CONFIG = {
   },
   "combinedModes": [
     {
+      "id": "irstBase",
+      "name": "IRST mode (WZ-219) - Base",
+      "percent": 26,
+      "moving": 0.855,
+      "foliage": 0.65,
+      "note": "Tier 11 - not fully upgraded, narrowest beam",
+      "slot": "irstMode"
+    },
+    {
       "id": "irst",
-      "name": "IRST mode (WZ-219) - Experimental!",
+      "name": "IRST mode (WZ-219) - Upgraded",
       "percent": 30,
       "moving": 0.825,
       "foliage": 0.6,
-      "note": "Tier 11 - fully upgraded, narrowest beam"
+      "note": "Tier 11 - fully upgraded, narrowest beam",
+      "slot": "irstMode"
     }
   ],
   "_combinedModeNote": "Vehicle modes that act on both sides of the calculation at once: a view range multiplier like a field mod, plus CVS-style concealment reduction. UNVERIFIED against the game.",
+  "combinedModeGroupLabel": "No IRST",
   "icons": {
     "bia": "images/bia.png",
     "binocs": "images/binocs.png",
@@ -876,20 +893,35 @@ function renderModes() {
     const p = +((1 - m) * 100).toFixed(2);
     return (p >= 0 ? '\u2212' : '+') + Math.abs(p) + '%';
   };
-  CONFIG.combinedModes.forEach(m => {
+
+  // Radio group: a tank is in one mode at a time, and "none" is the default.
+  const set = document.createElement('div');
+  set.className = 'group';
+
+  const row = (m, checked) => {
     const label = document.createElement('label');
     label.className = 'toggle';
-    const bits = [`+${m.percent}% view range`];
-    if (m.moving !== 1) bits.push(`${pct(m.moving)} moving`);
-    if (m.foliage !== 1) bits.push(`${pct(m.foliage)} foliage`);
+    const bits = [];
+    if (m.percent) bits.push(`+${m.percent}% view range`);
+    if (m.moving !== undefined && m.moving !== 1) bits.push(`${pct(m.moving)} moving`);
+    if (m.foliage !== undefined && m.foliage !== 1) bits.push(`${pct(m.foliage)} foliage`);
     label.innerHTML = `
-      <input type="checkbox" data-mode="${m.id}" data-percent="${m.percent}"
-             data-moving="${m.moving}" data-foliage="${m.foliage}">
+      <input type="radio" name="vehicleMode" data-mode="${m.id}"
+             data-percent="${m.percent || 0}"
+             data-moving="${m.moving === undefined ? 1 : m.moving}"
+             data-foliage="${m.foliage === undefined ? 1 : m.foliage}"
+             ${checked ? 'checked' : ''}>
+      ${iconFor(m.id)}
       <span class="toggle-name">${m.name}${m.note ? `<span class="toggle-note">${m.note}</span>` : ''}</span>
       <span class="toggle-val">${bits.join('<br>')}</span>`;
     label.querySelector('input').addEventListener('change', calculate);
-    box.appendChild(label);
-  });
+    return label;
+  };
+
+  set.appendChild(row({ id: 'modeNone',
+    name: CONFIG.combinedModeGroupLabel || 'No vehicle mode' }, true));
+  CONFIG.combinedModes.forEach(m => set.appendChild(row(m, false)));
+  box.appendChild(set);
 }
 
 function renderCVS() {
@@ -1362,6 +1394,16 @@ function calculate() {
   const gain = vr - base;
 
   out.innerHTML = vr.toFixed(2) + '<span> m</span>';
+
+  // Commander's effective qualification, after equipment, consumables and
+  // the situational skills have all been added in.
+  const qualBox = document.getElementById('qualSummary');
+  if (qualBox) {
+    qualBox.innerHTML = `New Commander Qualification = <b>${+C.toFixed(3)}%</b>`
+      + `<br><span class="qual-note">Situational skills give a flat unboosted `
+      + `percentage to commander for view range purposes</span>`;
+  }
+
   calculateSpotting(vr);
 
 }
