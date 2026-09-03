@@ -20,6 +20,29 @@
 
   * { box-sizing: border-box; }
 
+  /* Oswald and Barlow have no CJK glyphs; fall back to the platform's own. */
+  /* :lang(zh) also matches zh-Hant, so every CJK script is covered here. */
+  :root:lang(zh) body, :root:lang(ja) body,
+  :root:lang(zh) h1, :root:lang(ja) h1,
+  :root:lang(zh) h2, :root:lang(ja) h2,
+  :root:lang(zh) button, :root:lang(ja) button,
+  :root:lang(zh) input, :root:lang(ja) input,
+  :root:lang(zh) select, :root:lang(ja) select {
+    font-family: 'Oswald', 'Barlow', 'Microsoft YaHei', 'PingFang SC',
+                 'Microsoft JhengHei', 'PingFang TC', 'Hiragino Sans GB',
+                 'Yu Gothic', 'Hiragino Kaku Gothic ProN', 'Meiryo',
+                 'Noto Sans CJK SC', 'Noto Sans CJK TC', 'Noto Sans CJK JP',
+                 sans-serif;
+  }
+
+  /* Uppercasing and wide letter-spacing are meaningless for CJK text. */
+  :root:lang(zh) h2, :root:lang(ja) h2,
+  :root:lang(zh) .readout-label, :root:lang(ja) .readout-label,
+  :root:lang(zh) #resetBtn, :root:lang(ja) #resetBtn {
+    text-transform: none;
+    letter-spacing: 0.02em;
+  }
+
   body {
     margin: 0;
     padding: 2rem 1rem 4rem;
@@ -53,6 +76,49 @@
     text-transform: uppercase;
     margin: 0 0 0.25rem;
   }
+
+  .topbar {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .topbar h1 { flex: 1 1 auto; }
+
+  .lang-picker {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .lang-note {
+    font-family: 'Barlow Semi Condensed', sans-serif;
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    margin: 0.25rem 0 0;
+    text-align: right;
+    max-width: 11rem;
+    line-height: 1.3;
+    opacity: 0.8;
+  }
+
+  #langSelect {
+    flex: 0 0 auto;
+    font-family: 'Segoe UI Emoji', 'Noto Color Emoji', 'Apple Color Emoji',
+                 'Barlow Semi Condensed', sans-serif;
+    background: var(--plate);
+    border: 1px solid var(--steel-line);
+    color: var(--text);
+    font-family: 'Barlow Semi Condensed', sans-serif;
+    font-size: 0.9rem;
+    padding: 0.35rem 0.5rem;
+    border-radius: 0;
+    cursor: pointer;
+  }
+
+  #langSelect:focus-visible { outline: 2px solid var(--optic); outline-offset: 1px; }
 
   .sub {
     font-family: 'Barlow Semi Condensed', sans-serif;
@@ -216,12 +282,17 @@
 
   .vehicle-row {
     display: flex;
-    align-items: flex-end;
+    align-items: stretch;
     gap: 0.75rem;
     flex-wrap: wrap;
   }
 
-  .vehicle-row .field { flex: 0 0 auto; }
+  .vehicle-row .field {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
 
   input[type="number"]#baseVR { width: 7rem; }
 
@@ -234,8 +305,13 @@
     font-size: 1.125rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    padding: 0 0.9rem;
-    height: 2.9rem;
+    /* min-height rather than height: translated labels are longer than the
+       English one and need room to wrap instead of spilling out. */
+    padding: 0.5rem 0.9rem;
+    min-height: 2.9rem;
+    line-height: 1.2;
+    white-space: normal;
+    overflow-wrap: break-word;
     cursor: pointer;
     border-radius: 0;
   }
@@ -422,34 +498,41 @@
 <body>
 <div class="shell">
 
-  <h1>World of Tanks View Range and Spotting Distance Calculator</h1>
+  <div class="topbar">
+    <h1 data-t="title">World of Tanks View Range and Spotting Distance Calculator</h1>
+    <div class="lang-picker">
+      <select id="langSelect" aria-label="Language"></select>
+      <p class="lang-note" data-t="lang_note">Text other than English is AI generated</p>
+      <p class="lang-note" data-t="lang_note2">Skill and Equipment names may differ from in game descriptions</p>
+    </div>
+  </div>
 
   <div class="panel">
-    <h2>Vehicle</h2>
+    <h2 data-t="h_vehicle">Vehicle</h2>
     <div class="vehicle-row">
       <label class="field">
-        <span class="field-label">Base view range (metres)</span>
+        <span class="field-label" data-t="l_baseVR">Base view range (metres)</span>
         <input type="number" id="baseVR" value="410" min="0" step="1" inputmode="decimal">
       </label>
-      <button type="button" id="resetBtn">Clear all selections below</button>
+      <button type="button" id="resetBtn" data-t="btn_reset">Clear all selections below</button>
     </div>
-    <p class="sub">Base commander assumed to be at 100% major qualification.</p>
+    <p class="sub" data-t="subtitle">Base commander assumed to be at 100% major qualification.</p>
   </div>
 
   <div class="columns">
     <div class="column">
   <div class="panel">
-    <h2>Commander qualification percentage</h2>
+    <h2 data-t="h_qual">Commander qualification percentage</h2>
     <div id="crewBonuses"><p class="msg">Loading settings…</p></div>
   </div>
 
   <div class="panel">
-    <h2>Situational crew skills that add to Commander qualification percentage</h2>
+    <h2 data-t="h_situational">Situational crew skills that add to Commander qualification percentage</h2>
     <div id="conditionalSkills"></div>
   </div>
 
   <div class="panel">
-    <h2>View range percent bonuses</h2>
+    <h2 data-t="h_flat">View range percent bonuses</h2>
     <div id="flatBonuses"></div>
   </div>
 
@@ -457,51 +540,51 @@
 
     <div class="column">
   <div class="panel">
-    <h2>Crew Skills that add View Range percentage</h2>
+    <h2 data-t="h_skills">Crew Skills that add View Range percentage</h2>
     <div id="skills"></div>
   </div>
 
   <div class="panel">
-    <h2>Commander's Vision System bonuses</h2>
+    <h2 data-t="h_cvs">Commander's Vision System bonuses</h2>
     <div id="cvs"></div>
   </div>
 
   <div class="panel">
-    <h2>Vehicle modes</h2>
+    <h2 data-t="h_modes">Vehicle modes</h2>
     <div id="combinedModes"></div>
   </div>
 
   <div class="panel">
-    <h2>Enemy concealment</h2>
+    <h2 data-t="h_conceal">Enemy concealment</h2>
     <div class="conceal-row">
       <label class="field">
-        <span class="field-label">Total Enemy tank's camouflage (%)</span>
+        <span class="field-label" data-t="l_camo">Total Enemy tank's camouflage (%)</span>
         <input type="number" id="camo" value="30" min="0" max="100" step="0.1" inputmode="decimal">
       </label>
       <label class="field">
-        <span class="field-label">Total foliage / bush camouflage (%)</span>
+        <span class="field-label" data-t="l_foliage">Total foliage / bush camouflage (%)</span>
         <input type="number" id="foliage" value="0" min="0" max="80" step="0.1" inputmode="decimal">
       </label>
       <div class="field conceal-total">
-        <span class="field-label">Combined enemy camouflage</span>
+        <span class="field-label" data-t="l_combined">Combined enemy camouflage</span>
         <span class="conceal-total-value" id="camoTotal">—</span>
       </div>
     </div>
-    <p class="footnote">Assumes light and heavy bushes give 25 and 50% camo. Multiple bushes stack but don't exceed 80%</p>
+    <p class="footnote" data-t="fn_bush">Assumes light and heavy bushes give 25 and 50% camo. Multiple bushes stack but don't exceed 80%</p>
   </div>
 
   <div class="readout readout-spot">
     <div class="spot-pair">
       <div class="spot-case">
-        <span class="readout-label">View range</span>
+        <span class="readout-label" data-t="l_viewRange">View range</span>
         <span class="readout-value" id="result">—</span>
       </div>
       <div class="spot-case">
-        <span class="readout-label">Stationary Enemy<br>Spot within</span>
+        <span class="readout-label" data-t="l_still">Stationary Enemy<br>Spot within</span>
         <span class="readout-value" id="spotStill">—</span>
       </div>
       <div class="spot-case">
-        <span class="readout-label">Moving Enemy<br>Spot within</span>
+        <span class="readout-label" data-t="l_moving">Moving Enemy<br>Spot within</span>
         <span class="readout-value" id="spotMove">—</span>
       </div>
     </div>
@@ -512,11 +595,11 @@
     </div>
   </div>
 
-  <p class="credit">Made by RedshiftOTF<br>v1.1.1</p>
+  <p class="credit"><span data-t="credit">Made by RedshiftOTF</span><br>v1.2</p>
 
-  <p class="disclaimer">This is not an official Wargaming or World of Tanks website.
-    All images belong to <a href="https://Wargaming.net" target="_blank" rel="noopener">Wargaming.net</a><br>
-    World of Tanks is a trademark of <a href="http://www.wargaming.net" target="_blank" rel="noopener">Wargaming.net</a></p>
+  <p class="disclaimer"><span data-t="disclaimer1">This is not an official Wargaming or World of Tanks website.
+    All images belong to</span> <a href="https://Wargaming.net" target="_blank" rel="noopener">Wargaming.net</a><br>
+    <span data-t="disclaimer2">World of Tanks is a trademark of</span> <a href="http://www.wargaming.net" target="_blank" rel="noopener">Wargaming.net</a></p>
 
 </div>
 
@@ -812,6 +895,2271 @@ const CONFIG = {
   ],
   "_combinedModeNote": "Vehicle modes that act on both sides of the calculation at once: a view range multiplier like a field mod, plus CVS-style concealment reduction. UNVERIFIED against the game.",
   "combinedModeGroupLabel": "No IRST",
+  "i18n": {
+    "en": {
+      "label": "English",
+      "items": {},
+      "ui": {
+        "title": "World of Tanks View Range and Spotting Distance Calculator",
+        "subtitle": "Base commander assumed to be at 100% major qualification.",
+        "h_vehicle": "Vehicle",
+        "h_qual": "Commander qualification percentage",
+        "h_situational": "Situational crew skills that add to Commander qualification percentage",
+        "h_flat": "View range percent bonuses",
+        "h_skills": "Crew Skills that add View Range percentage",
+        "h_cvs": "Commander's Vision System bonuses",
+        "h_modes": "Vehicle modes",
+        "h_conceal": "Enemy concealment",
+        "l_baseVR": "Base view range (metres)",
+        "l_camo": "Total Enemy tank's camouflage (%)",
+        "l_foliage": "Total foliage / bush camouflage (%)",
+        "l_combined": "Combined enemy camouflage",
+        "l_viewRange": "View range",
+        "l_still": "Stationary Enemy<br>Spot within",
+        "l_moving": "Moving Enemy<br>Spot within",
+        "btn_reset": "Clear all selections below",
+        "fn_situational": "Crew skill percentage boosts these values however, only the base values of these skills are added to the Commander for view range calculations. These crew skills do not boost the Recon, Situational Awareness or Threat Search crew skills below",
+        "fn_bush": "Assumes light and heavy bushes give 25 and 50% camo. Multiple bushes stack but don't exceed 80%",
+        "credit": "Made by RedshiftOTF",
+        "disclaimer1": "This is not an official Wargaming or World of Tanks website. All images belong to",
+        "disclaimer2": "World of Tanks is a trademark of",
+        "none_vents": "No vents",
+        "none_vision": "No optics or binoculars",
+        "none_irst": "No IRST",
+        "cvs_total": "Total",
+        "cvs_moving": "camo from moving vehicles",
+        "cvs_foliage": "camo from vehicles behind foliage",
+        "cvs_bonuses": "CVS bonuses",
+        "cvs_shortMoving": "camo moving",
+        "cvs_shortFoliage": "camo behind foliage",
+        "cvs_none": "No CVS bonuses",
+        "cvs_noReduction": "No concealment reduction",
+        "qual_line": "New Commander Qualification =",
+        "qual_note": "Situational skills give a flat unboosted percentage to commander for view range purposes",
+        "conceal_line": "New Enemy Concealment  =",
+        "conceal_still": "stationary",
+        "conceal_moving": "moving",
+        "conceal_against": "against",
+        "conceal_vr": "view range",
+        "err_base": "Enter a base view range to see a result.",
+        "err_camo": "Enter camouflage values between 0 and 100.",
+        "eff_moving": "moving",
+        "eff_foliage": "foliage",
+        "eff_viewRange": "view range",
+        "lang_note": "Text other than English is AI generated",
+        "lang_note2": "Skill and Equipment names may differ from in game descriptions"
+      },
+      "flag": "🇬🇧 🇺🇸"
+    },
+    "fr": {
+      "label": "Français",
+      "items": {
+        "bia": {
+          "name": "Frères d'armes",
+          "note": "Tous les membres d'équipage formés à 100 %"
+        },
+        "vents": {
+          "name": "Ventilation"
+        },
+        "ventsSlot": {
+          "name": "Ventilation (emplacement d'équipement)",
+          "note": "Montée dans un emplacement d'équipement"
+        },
+        "bountyVents": {
+          "name": "Ventilation prime"
+        },
+        "bondVents": {
+          "name": "Ventilation de bons"
+        },
+        "ventPurge": {
+          "name": "Directive Purge de ventilation",
+          "note": "Nécessite une ventilation"
+        },
+        "food": {
+          "name": "Consommable de ravitaillement"
+        },
+        "emergency": {
+          "name": "Urgence",
+          "note": "15 s après que votre char a subi des dégâts"
+        },
+        "holdTheLine": {
+          "name": "Tenir la ligne",
+          "note": "Tant que l'équipe ennemie compte au moins 3 chars de plus que la vôtre"
+        },
+        "staySharp": {
+          "name": "Rester vigilant",
+          "note": "15 s après l'utilisation d'une trousse de secours"
+        },
+        "bulletproof": {
+          "name": "Pare-balles",
+          "note": "Dès que les dégâts bloqués dépassent les points de structure de votre char"
+        },
+        "sideBySide": {
+          "name": "Côte à côte",
+          "note": "À moins de 50 m d'un véhicule allié du même type"
+        },
+        "communicationsExpert": {
+          "name": "Expert en communications",
+          "note": "Dès que les dégâts assistés dépassent les points de structure initiaux de votre char"
+        },
+        "recon": {
+          "name": "Reconnaissance",
+          "note": "Compétence du chef de char"
+        },
+        "situationalAwareness": {
+          "name": "Vigilance",
+          "note": "Compétence de l'opérateur radio"
+        },
+        "threatSearch": {
+          "name": "Recherche de menaces",
+          "note": "S'active pendant 5 secondes dès le déclenchement du Sixième sens"
+        },
+        "fieldMod": {
+          "name": "Modification de terrain (vue)",
+          "note": "Le pourcentage varie selon le véhicule - à vérifier en jeu"
+        },
+        "optics": {
+          "name": "Optiques traitées"
+        },
+        "opticsSlot": {
+          "name": "Optiques traitées (emplacement de reconnaissance)"
+        },
+        "bountyOptics": {
+          "name": "Optiques prime"
+        },
+        "bondOptics": {
+          "name": "Optiques de bons"
+        },
+        "binocs": {
+          "name": "Lunette binoculaire",
+          "note": "Seulement après 3 secondes à l'arrêt"
+        },
+        "binocsSlot": {
+          "name": "Lunette binoculaire (emplacement de reconnaissance)",
+          "note": "Seulement après 3 secondes à l'arrêt"
+        },
+        "bondBinocs": {
+          "name": "Lunette binoculaire de bons",
+          "note": "Seulement après 2 secondes à l'arrêt"
+        },
+        "opticalCalibration": {
+          "name": "Directive Calibrage optique",
+          "note": "Nécessite des optiques. Le jeu indique 2,5 % ; l'effet mesuré est de 2,3 %."
+        },
+        "irstBase": {
+          "name": "Mode IRST (WZ-219) - Base",
+          "note": "Rang 11 - non entièrement amélioré, faisceau le plus étroit"
+        },
+        "irst": {
+          "name": "Mode IRST (WZ-219) - Amélioré",
+          "note": "Rang 11 - entièrement amélioré, faisceau le plus étroit"
+        },
+        "cvsNone": {
+          "name": "Pas de SVC"
+        },
+        "cvsStandard": {
+          "name": "Système de vision du chef de char"
+        },
+        "cvsSlot": {
+          "name": "Système de vision du chef de char (emplacement de reconnaissance)"
+        },
+        "cvsModNone": {
+          "name": "Pas de modification SVC"
+        },
+        "panoramicTriplex": {
+          "name": "Triplex panoramique",
+          "note": "Certains chars de rang 10 uniquement"
+        },
+        "narrowAngle": {
+          "name": "Dispositif d'observation à angle étroit",
+          "note": "Certains chars de rang 10 uniquement"
+        },
+        "spotBonusFoliage": {
+          "name": "Bonus de repérage : feuillage",
+          "note": "Amélioration de rang 11"
+        },
+        "spotBonusMovement": {
+          "name": "Bonus de repérage : mouvement",
+          "note": "Amélioration de rang 11"
+        }
+      },
+      "ui": {
+        "title": "Calculateur de portée de vue et de distance de repérage World of Tanks",
+        "subtitle": "Le chef de char de base est supposé avoir 100 % de qualification principale.",
+        "h_vehicle": "Véhicule",
+        "h_qual": "Pourcentage de qualification du chef de char",
+        "h_situational": "Compétences situationnelles qui augmentent la qualification du chef de char",
+        "h_flat": "Bonus de portée de vue en pourcentage",
+        "h_skills": "Compétences d'équipage qui augmentent la portée de vue",
+        "h_cvs": "Bonus du système de vision du chef de char",
+        "h_modes": "Modes de véhicule",
+        "h_conceal": "Camouflage ennemi",
+        "l_baseVR": "Portée de vue de base (mètres)",
+        "l_camo": "Camouflage total du char ennemi (%)",
+        "l_foliage": "Camouflage total du feuillage / des buissons (%)",
+        "l_combined": "Camouflage ennemi combiné",
+        "l_viewRange": "Portée de vue",
+        "l_still": "Ennemi à l'arrêt<br>Repéré à moins de",
+        "l_moving": "Ennemi en mouvement<br>Repéré à moins de",
+        "btn_reset": "Effacer toutes les sélections ci-dessous",
+        "fn_situational": "Le pourcentage de compétence d'équipage augmente ces valeurs, mais seules les valeurs de base de ces compétences sont ajoutées au chef de char pour le calcul de la portée de vue. Ces compétences n'augmentent pas les compétences Reconnaissance, Vigilance ou Recherche de menaces ci-dessous.",
+        "fn_bush": "Suppose que les buissons légers et denses donnent 25 et 50 % de camouflage. Les buissons se cumulent mais ne dépassent pas 80 %.",
+        "credit": "Créé par RedshiftOTF",
+        "disclaimer1": "Ce site n'est pas un site officiel de Wargaming ou de World of Tanks. Toutes les images appartiennent à",
+        "disclaimer2": "World of Tanks est une marque déposée de",
+        "none_vents": "Pas de ventilation",
+        "none_vision": "Pas d'optiques ni de lunette binoculaire",
+        "none_irst": "Pas d'IRST",
+        "cvs_total": "Total",
+        "cvs_moving": "de camouflage des véhicules en mouvement",
+        "cvs_foliage": "de camouflage des véhicules derrière du feuillage",
+        "cvs_bonuses": "Bonus SVC",
+        "cvs_shortMoving": "camouflage en mouvement",
+        "cvs_shortFoliage": "camouflage derrière du feuillage",
+        "cvs_none": "Aucun bonus SVC",
+        "cvs_noReduction": "Aucune réduction de camouflage",
+        "qual_line": "Nouvelle qualification du chef de char =",
+        "qual_note": "Les compétences situationnelles donnent au chef de char un pourcentage fixe, non majoré, pour le calcul de la portée de vue",
+        "conceal_line": "Nouveau camouflage ennemi  =",
+        "conceal_still": "à l'arrêt",
+        "conceal_moving": "en mouvement",
+        "conceal_against": "contre",
+        "conceal_vr": "de portée de vue",
+        "err_base": "Saisissez une portée de vue de base pour voir un résultat.",
+        "err_camo": "Saisissez des valeurs de camouflage entre 0 et 100.",
+        "eff_moving": "en mouvement",
+        "eff_foliage": "feuillage",
+        "eff_viewRange": "de portée de vue",
+        "lang_note": "Les textes autres qu'en anglais sont générés par IA",
+        "lang_note2": "Les noms des compétences et des équipements peuvent différer de ceux du jeu"
+      },
+      "flag": "🇫🇷"
+    },
+    "de": {
+      "label": "Deutsch",
+      "flag": "🇩🇪",
+      "ui": {
+        "title": "World of Tanks Sichtweiten- und Aufklärungsreichweiten-Rechner",
+        "subtitle": "Es wird von einem Kommandanten mit 100 % Hauptqualifikation ausgegangen.",
+        "h_vehicle": "Fahrzeug",
+        "h_qual": "Qualifikation des Kommandanten in Prozent",
+        "h_situational": "Situationsbedingte Fähigkeiten, die die Qualifikation des Kommandanten erhöhen",
+        "h_flat": "Prozentuale Sichtweiten-Boni",
+        "h_skills": "Besatzungsfähigkeiten, die die Sichtweite prozentual erhöhen",
+        "h_cvs": "Boni des Kommandanten-Sichtsystems",
+        "h_modes": "Fahrzeugmodi",
+        "h_conceal": "Tarnung des Gegners",
+        "l_baseVR": "Grundsichtweite (Meter)",
+        "l_camo": "Gesamttarnung des gegnerischen Fahrzeugs (%)",
+        "l_foliage": "Gesamttarnung durch Laub / Büsche (%)",
+        "l_combined": "Gesamttarnung des Gegners",
+        "l_viewRange": "Sichtweite",
+        "l_still": "Stehender Gegner<br>Aufgeklärt innerhalb von",
+        "l_moving": "Fahrender Gegner<br>Aufgeklärt innerhalb von",
+        "btn_reset": "Alle Auswahlen unten zurücksetzen",
+        "fn_situational": "Der Prozentsatz der Besatzungsfähigkeiten erhöht diese Werte, jedoch werden nur die Grundwerte dieser Fähigkeiten für die Sichtweitenberechnung zum Kommandanten addiert. Diese Fähigkeiten verstärken die unten aufgeführten Fähigkeiten Aufklärung, Situationsbewusstsein und Bedrohungssuche nicht.",
+        "fn_bush": "Annahme: leichte und dichte Büsche geben 25 bzw. 50 % Tarnung. Mehrere Büsche summieren sich, überschreiten aber nicht 80 %.",
+        "credit": "Erstellt von RedshiftOTF",
+        "disclaimer1": "Dies ist keine offizielle Website von Wargaming oder World of Tanks. Alle Bilder gehören",
+        "disclaimer2": "World of Tanks ist eine Marke von",
+        "none_vents": "Keine Belüftung",
+        "none_vision": "Keine Optik oder Fernglas",
+        "none_irst": "Kein IRST",
+        "cvs_total": "Gesamt",
+        "cvs_moving": "Tarnung fahrender Fahrzeuge",
+        "cvs_foliage": "Tarnung von Fahrzeugen hinter Laub",
+        "cvs_bonuses": "KSS-Boni",
+        "cvs_shortMoving": "Tarnung in Bewegung",
+        "cvs_shortFoliage": "Tarnung hinter Laub",
+        "cvs_none": "Keine KSS-Boni",
+        "cvs_noReduction": "Keine Tarnungsreduzierung",
+        "qual_line": "Neue Qualifikation des Kommandanten =",
+        "qual_note": "Situationsbedingte Fähigkeiten geben dem Kommandanten für die Sichtweitenberechnung einen festen, nicht verstärkten Prozentsatz",
+        "conceal_line": "Neue Tarnung des Gegners  =",
+        "conceal_still": "stehend",
+        "conceal_moving": "fahrend",
+        "conceal_against": "gegen",
+        "conceal_vr": "Sichtweite",
+        "err_base": "Geben Sie eine Grundsichtweite ein, um ein Ergebnis zu sehen.",
+        "err_camo": "Geben Sie Tarnungswerte zwischen 0 und 100 ein.",
+        "eff_moving": "in Bewegung",
+        "eff_foliage": "Laub",
+        "eff_viewRange": "Sichtweite",
+        "lang_note": "Texte außer Englisch sind KI-generiert",
+        "lang_note2": "Namen von Fähigkeiten und Ausrüstung können von den Bezeichnungen im Spiel abweichen"
+      },
+      "items": {
+        "bia": {
+          "name": "Waffenbrüder",
+          "note": "Alle Besatzungsmitglieder zu 100 % ausgebildet"
+        },
+        "vents": {
+          "name": "Belüftung"
+        },
+        "ventsSlot": {
+          "name": "Belüftung (Ausrüstungsslot)",
+          "note": "In einem Ausrüstungsslot montiert"
+        },
+        "bountyVents": {
+          "name": "Prämien-Belüftung"
+        },
+        "bondVents": {
+          "name": "Anleihen-Belüftung"
+        },
+        "ventPurge": {
+          "name": "Direktive Belüftungsspülung",
+          "note": "Erfordert Belüftung"
+        },
+        "food": {
+          "name": "Verpflegung"
+        },
+        "emergency": {
+          "name": "Notfall",
+          "note": "15 s nachdem Ihr Fahrzeug Schaden erlitten hat"
+        },
+        "holdTheLine": {
+          "name": "Stellung halten",
+          "note": "Solange das gegnerische Team mindestens 3 Fahrzeuge mehr hat als Ihres"
+        },
+        "staySharp": {
+          "name": "Wachsam bleiben",
+          "note": "15 s nach Einsatz eines Verbandskastens"
+        },
+        "bulletproof": {
+          "name": "Kugelsicher",
+          "note": "Sobald der abgeblockte Schaden die Trefferpunkte Ihres Fahrzeugs übersteigt"
+        },
+        "sideBySide": {
+          "name": "Seite an Seite",
+          "note": "Innerhalb von 50 m eines verbündeten Fahrzeugs desselben Typs"
+        },
+        "communicationsExpert": {
+          "name": "Kommunikationsexperte",
+          "note": "Sobald der assistierte Schaden die Anfangstrefferpunkte Ihres Fahrzeugs übersteigt"
+        },
+        "recon": {
+          "name": "Aufklärung",
+          "note": "Fähigkeit des Kommandanten"
+        },
+        "situationalAwareness": {
+          "name": "Situationsbewusstsein",
+          "note": "Fähigkeit des Funkers"
+        },
+        "threatSearch": {
+          "name": "Bedrohungssuche",
+          "note": "Wird 5 Sekunden lang aktiv, sobald der Sechste Sinn auslöst"
+        },
+        "fieldMod": {
+          "name": "Feldmodifikation (Sichtweite)",
+          "note": "Der Prozentsatz variiert je nach Fahrzeug - im Spiel prüfen"
+        },
+        "optics": {
+          "name": "Vergütete Optik"
+        },
+        "opticsSlot": {
+          "name": "Vergütete Optik (Aufklärungsslot)"
+        },
+        "bountyOptics": {
+          "name": "Prämien-Optik"
+        },
+        "bondOptics": {
+          "name": "Anleihen-Optik"
+        },
+        "binocs": {
+          "name": "Fernglas",
+          "note": "Erst nach 3 Sekunden im Stillstand"
+        },
+        "binocsSlot": {
+          "name": "Fernglas (Aufklärungsslot)",
+          "note": "Erst nach 3 Sekunden im Stillstand"
+        },
+        "bondBinocs": {
+          "name": "Anleihen-Fernglas",
+          "note": "Erst nach 2 Sekunden im Stillstand"
+        },
+        "opticalCalibration": {
+          "name": "Direktive Optische Kalibrierung",
+          "note": "Erfordert Optik. Das Spiel gibt 2,5 % an; gemessen wurden 2,3 %."
+        },
+        "irstBase": {
+          "name": "IRST-Modus (WZ-219) - Basis",
+          "note": "Stufe 11 - nicht vollständig ausgebaut, schmalster Strahl"
+        },
+        "irst": {
+          "name": "IRST-Modus (WZ-219) - Ausgebaut",
+          "note": "Stufe 11 - vollständig ausgebaut, schmalster Strahl"
+        },
+        "cvsNone": {
+          "name": "Kein KSS"
+        },
+        "cvsStandard": {
+          "name": "Kommandanten-Sichtsystem"
+        },
+        "cvsSlot": {
+          "name": "Kommandanten-Sichtsystem (Aufklärungsslot)"
+        },
+        "cvsModNone": {
+          "name": "Keine KSS-Feldmodifikation"
+        },
+        "panoramicTriplex": {
+          "name": "Panorama-Triplex",
+          "note": "Nur bestimmte Stufe-10-Fahrzeuge"
+        },
+        "narrowAngle": {
+          "name": "Beobachtungsgerät mit engem Winkel",
+          "note": "Nur bestimmte Stufe-10-Fahrzeuge"
+        },
+        "spotBonusFoliage": {
+          "name": "Aufklärungsbonus: Laub",
+          "note": "Stufe-11-Verbesserung"
+        },
+        "spotBonusMovement": {
+          "name": "Aufklärungsbonus: Bewegung",
+          "note": "Stufe-11-Verbesserung"
+        }
+      }
+    },
+    "es": {
+      "label": "Español",
+      "flag": "🇪🇸",
+      "ui": {
+        "title": "Calculadora de alcance de visión y distancia de detección de World of Tanks",
+        "subtitle": "Se asume un comandante base con el 100 % de cualificación principal.",
+        "h_vehicle": "Vehículo",
+        "h_qual": "Porcentaje de cualificación del comandante",
+        "h_situational": "Habilidades situacionales que aumentan la cualificación del comandante",
+        "h_flat": "Bonificaciones porcentuales de alcance de visión",
+        "h_skills": "Habilidades de tripulación que aumentan el alcance de visión",
+        "h_cvs": "Bonificaciones del sistema de visión del comandante",
+        "h_modes": "Modos de vehículo",
+        "h_conceal": "Camuflaje enemigo",
+        "l_baseVR": "Alcance de visión base (metros)",
+        "l_camo": "Camuflaje total del vehículo enemigo (%)",
+        "l_foliage": "Camuflaje total del follaje / arbustos (%)",
+        "l_combined": "Camuflaje enemigo combinado",
+        "l_viewRange": "Alcance de visión",
+        "l_still": "Enemigo detenido<br>Detectado a menos de",
+        "l_moving": "Enemigo en movimiento<br>Detectado a menos de",
+        "btn_reset": "Borrar todas las selecciones de abajo",
+        "fn_situational": "El porcentaje de habilidad de la tripulación aumenta estos valores, pero solo los valores base de estas habilidades se suman al comandante para el cálculo del alcance de visión. Estas habilidades no aumentan las habilidades Reconocimiento, Conciencia situacional ni Búsqueda de amenazas de abajo.",
+        "fn_bush": "Se asume que los arbustos ligeros y densos dan un 25 y un 50 % de camuflaje. Varios arbustos se acumulan pero no superan el 80 %.",
+        "credit": "Creado por RedshiftOTF",
+        "disclaimer1": "Este no es un sitio web oficial de Wargaming ni de World of Tanks. Todas las imágenes pertenecen a",
+        "disclaimer2": "World of Tanks es una marca registrada de",
+        "none_vents": "Sin ventilación",
+        "none_vision": "Sin ópticas ni binoculares",
+        "none_irst": "Sin IRST",
+        "cvs_total": "Total",
+        "cvs_moving": "de camuflaje de vehículos en movimiento",
+        "cvs_foliage": "de camuflaje de vehículos tras el follaje",
+        "cvs_bonuses": "Bonificaciones SVC",
+        "cvs_shortMoving": "camuflaje en movimiento",
+        "cvs_shortFoliage": "camuflaje tras el follaje",
+        "cvs_none": "Sin bonificaciones SVC",
+        "cvs_noReduction": "Sin reducción de camuflaje",
+        "qual_line": "Nueva cualificación del comandante =",
+        "qual_note": "Las habilidades situacionales dan al comandante un porcentaje fijo, sin aumentar, para el cálculo del alcance de visión",
+        "conceal_line": "Nuevo camuflaje enemigo  =",
+        "conceal_still": "detenido",
+        "conceal_moving": "en movimiento",
+        "conceal_against": "frente a",
+        "conceal_vr": "de alcance de visión",
+        "err_base": "Introduzca un alcance de visión base para ver un resultado.",
+        "err_camo": "Introduzca valores de camuflaje entre 0 y 100.",
+        "eff_moving": "en movimiento",
+        "eff_foliage": "follaje",
+        "eff_viewRange": "de alcance de visión",
+        "lang_note": "Los textos que no están en inglés han sido generados por IA",
+        "lang_note2": "Los nombres de habilidades y equipamiento pueden diferir de los del juego"
+      },
+      "items": {
+        "bia": {
+          "name": "Hermanos de armas",
+          "note": "Todos los miembros de la tripulación entrenados al 100 %"
+        },
+        "vents": {
+          "name": "Ventilación"
+        },
+        "ventsSlot": {
+          "name": "Ventilación (ranura de equipamiento)",
+          "note": "Montada en una ranura de equipamiento"
+        },
+        "bountyVents": {
+          "name": "Ventilación de recompensa"
+        },
+        "bondVents": {
+          "name": "Ventilación de bonos"
+        },
+        "ventPurge": {
+          "name": "Directiva Purga de ventilación",
+          "note": "Requiere ventilación"
+        },
+        "food": {
+          "name": "Consumible de raciones"
+        },
+        "emergency": {
+          "name": "Emergencia",
+          "note": "15 s después de que su vehículo reciba daño"
+        },
+        "holdTheLine": {
+          "name": "Mantener la línea",
+          "note": "Mientras el equipo enemigo tenga al menos 3 vehículos más que el suyo"
+        },
+        "staySharp": {
+          "name": "Mantenerse alerta",
+          "note": "15 s después de usar un botiquín"
+        },
+        "bulletproof": {
+          "name": "A prueba de balas",
+          "note": "Cuando el daño bloqueado supera los puntos de resistencia de su vehículo"
+        },
+        "sideBySide": {
+          "name": "Codo con codo",
+          "note": "A menos de 50 m de un vehículo aliado del mismo tipo"
+        },
+        "communicationsExpert": {
+          "name": "Experto en comunicaciones",
+          "note": "Cuando el daño asistido supera los puntos de resistencia iniciales de su vehículo"
+        },
+        "recon": {
+          "name": "Reconocimiento",
+          "note": "Habilidad del comandante"
+        },
+        "situationalAwareness": {
+          "name": "Conciencia situacional",
+          "note": "Habilidad del operador de radio"
+        },
+        "threatSearch": {
+          "name": "Búsqueda de amenazas",
+          "note": "Se activa durante 5 segundos al dispararse el Sexto sentido"
+        },
+        "fieldMod": {
+          "name": "Modificación de campo (alcance de visión)",
+          "note": "El porcentaje varía según el vehículo - compruébelo en el juego"
+        },
+        "optics": {
+          "name": "Ópticas revestidas"
+        },
+        "opticsSlot": {
+          "name": "Ópticas revestidas (ranura de reconocimiento)"
+        },
+        "bountyOptics": {
+          "name": "Ópticas de recompensa"
+        },
+        "bondOptics": {
+          "name": "Ópticas de bonos"
+        },
+        "binocs": {
+          "name": "Telescopio binocular",
+          "note": "Solo tras 3 segundos detenido"
+        },
+        "binocsSlot": {
+          "name": "Telescopio binocular (ranura de reconocimiento)",
+          "note": "Solo tras 3 segundos detenido"
+        },
+        "bondBinocs": {
+          "name": "Telescopio binocular de bonos",
+          "note": "Solo tras 2 segundos detenido"
+        },
+        "opticalCalibration": {
+          "name": "Directiva Calibración óptica",
+          "note": "Requiere ópticas. El juego indica un 2,5 %; el efecto medido es del 2,3 %."
+        },
+        "irstBase": {
+          "name": "Modo IRST (WZ-219) - Base",
+          "note": "Nivel 11 - no mejorado por completo, haz más estrecho"
+        },
+        "irst": {
+          "name": "Modo IRST (WZ-219) - Mejorado",
+          "note": "Nivel 11 - mejorado por completo, haz más estrecho"
+        },
+        "cvsNone": {
+          "name": "Sin SVC"
+        },
+        "cvsStandard": {
+          "name": "Sistema de visión del comandante"
+        },
+        "cvsSlot": {
+          "name": "Sistema de visión del comandante (ranura de reconocimiento)"
+        },
+        "cvsModNone": {
+          "name": "Sin modificación de SVC"
+        },
+        "panoramicTriplex": {
+          "name": "Triplex panorámico",
+          "note": "Solo ciertos vehículos de nivel 10"
+        },
+        "narrowAngle": {
+          "name": "Dispositivo de observación de ángulo estrecho",
+          "note": "Solo ciertos vehículos de nivel 10"
+        },
+        "spotBonusFoliage": {
+          "name": "Bonificación de detección: follaje",
+          "note": "Mejora de nivel 11"
+        },
+        "spotBonusMovement": {
+          "name": "Bonificación de detección: movimiento",
+          "note": "Mejora de nivel 11"
+        }
+      }
+    },
+    "pt": {
+      "label": "Português",
+      "flag": "🇵🇹",
+      "ui": {
+        "title": "Calculadora de alcance de visão e distância de deteção do World of Tanks",
+        "subtitle": "Assume-se um comandante base com 100 % de qualificação principal.",
+        "h_vehicle": "Veículo",
+        "h_qual": "Percentagem de qualificação do comandante",
+        "h_situational": "Habilidades situacionais que aumentam a qualificação do comandante",
+        "h_flat": "Bónus percentuais de alcance de visão",
+        "h_skills": "Habilidades da tripulação que aumentam o alcance de visão",
+        "h_cvs": "Bónus do sistema de visão do comandante",
+        "h_modes": "Modos do veículo",
+        "h_conceal": "Camuflagem inimiga",
+        "l_baseVR": "Alcance de visão base (metros)",
+        "l_camo": "Camuflagem total do veículo inimigo (%)",
+        "l_foliage": "Camuflagem total da folhagem / arbustos (%)",
+        "l_combined": "Camuflagem inimiga combinada",
+        "l_viewRange": "Alcance de visão",
+        "l_still": "Inimigo parado<br>Detetado a menos de",
+        "l_moving": "Inimigo em movimento<br>Detetado a menos de",
+        "btn_reset": "Limpar todas as seleções abaixo",
+        "fn_situational": "A percentagem de habilidade da tripulação aumenta estes valores, mas apenas os valores base destas habilidades são somados ao comandante no cálculo do alcance de visão. Estas habilidades não aumentam as habilidades Reconhecimento, Consciência situacional ou Deteção de ameaças abaixo.",
+        "fn_bush": "Assume que arbustos leves e densos dão 25 e 50 % de camuflagem. Vários arbustos acumulam-se mas não ultrapassam os 80 %.",
+        "credit": "Criado por RedshiftOTF",
+        "disclaimer1": "Este não é um site oficial da Wargaming nem do World of Tanks. Todas as imagens pertencem à",
+        "disclaimer2": "World of Tanks é uma marca registada da",
+        "none_vents": "Sem ventilação",
+        "none_vision": "Sem óticas nem binóculos",
+        "none_irst": "Sem IRST",
+        "cvs_total": "Total",
+        "cvs_moving": "de camuflagem de veículos em movimento",
+        "cvs_foliage": "de camuflagem de veículos atrás de folhagem",
+        "cvs_bonuses": "Bónus SVC",
+        "cvs_shortMoving": "camuflagem em movimento",
+        "cvs_shortFoliage": "camuflagem atrás de folhagem",
+        "cvs_none": "Sem bónus SVC",
+        "cvs_noReduction": "Sem redução de camuflagem",
+        "qual_line": "Nova qualificação do comandante =",
+        "qual_note": "As habilidades situacionais dão ao comandante uma percentagem fixa, não aumentada, para o cálculo do alcance de visão",
+        "conceal_line": "Nova camuflagem inimiga  =",
+        "conceal_still": "parado",
+        "conceal_moving": "em movimento",
+        "conceal_against": "face a",
+        "conceal_vr": "de alcance de visão",
+        "err_base": "Introduza um alcance de visão base para ver um resultado.",
+        "err_camo": "Introduza valores de camuflagem entre 0 e 100.",
+        "eff_moving": "em movimento",
+        "eff_foliage": "folhagem",
+        "eff_viewRange": "de alcance de visão",
+        "lang_note": "Os textos que não estão em inglês foram gerados por IA",
+        "lang_note2": "Os nomes de habilidades e equipamento podem diferir dos do jogo"
+      },
+      "items": {
+        "bia": {
+          "name": "Irmãos de armas",
+          "note": "Todos os membros da tripulação treinados a 100 %"
+        },
+        "vents": {
+          "name": "Ventilação"
+        },
+        "ventsSlot": {
+          "name": "Ventilação (ranhura de equipamento)",
+          "note": "Montada numa ranhura de equipamento"
+        },
+        "bountyVents": {
+          "name": "Ventilação de recompensa"
+        },
+        "bondVents": {
+          "name": "Ventilação de obrigações"
+        },
+        "ventPurge": {
+          "name": "Diretiva Purga de ventilação",
+          "note": "Requer ventilação"
+        },
+        "food": {
+          "name": "Consumível de rações"
+        },
+        "emergency": {
+          "name": "Emergência",
+          "note": "15 s depois de o seu veículo sofrer dano"
+        },
+        "holdTheLine": {
+          "name": "Manter a linha",
+          "note": "Enquanto a equipa inimiga tiver pelo menos mais 3 veículos do que a sua"
+        },
+        "staySharp": {
+          "name": "Manter-se alerta",
+          "note": "15 s após utilizar um kit de primeiros socorros"
+        },
+        "bulletproof": {
+          "name": "À prova de bala",
+          "note": "Quando o dano bloqueado ultrapassa os pontos de resistência do seu veículo"
+        },
+        "sideBySide": {
+          "name": "Lado a lado",
+          "note": "A menos de 50 m de um veículo aliado do mesmo tipo"
+        },
+        "communicationsExpert": {
+          "name": "Perito em comunicações",
+          "note": "Quando o dano assistido ultrapassa os pontos de resistência iniciais do seu veículo"
+        },
+        "recon": {
+          "name": "Reconhecimento",
+          "note": "Habilidade do comandante"
+        },
+        "situationalAwareness": {
+          "name": "Consciência situacional",
+          "note": "Habilidade do operador de rádio"
+        },
+        "threatSearch": {
+          "name": "Deteção de ameaças",
+          "note": "Ativa-se durante 5 segundos quando o Sexto sentido dispara"
+        },
+        "fieldMod": {
+          "name": "Modificação de campo (alcance de visão)",
+          "note": "A percentagem varia consoante o veículo - verifique no jogo"
+        },
+        "optics": {
+          "name": "Óticas revestidas"
+        },
+        "opticsSlot": {
+          "name": "Óticas revestidas (ranhura de reconhecimento)"
+        },
+        "bountyOptics": {
+          "name": "Óticas de recompensa"
+        },
+        "bondOptics": {
+          "name": "Óticas de obrigações"
+        },
+        "binocs": {
+          "name": "Binóculos",
+          "note": "Apenas após 3 segundos parado"
+        },
+        "binocsSlot": {
+          "name": "Binóculos (ranhura de reconhecimento)",
+          "note": "Apenas após 3 segundos parado"
+        },
+        "bondBinocs": {
+          "name": "Binóculos de obrigações",
+          "note": "Apenas após 2 segundos parado"
+        },
+        "opticalCalibration": {
+          "name": "Diretiva Calibração ótica",
+          "note": "Requer óticas. O jogo indica 2,5 %; o efeito medido é de 2,3 %."
+        },
+        "irstBase": {
+          "name": "Modo IRST (WZ-219) - Base",
+          "note": "Nível 11 - não totalmente melhorado, feixe mais estreito"
+        },
+        "irst": {
+          "name": "Modo IRST (WZ-219) - Melhorado",
+          "note": "Nível 11 - totalmente melhorado, feixe mais estreito"
+        },
+        "cvsNone": {
+          "name": "Sem SVC"
+        },
+        "cvsStandard": {
+          "name": "Sistema de visão do comandante"
+        },
+        "cvsSlot": {
+          "name": "Sistema de visão do comandante (ranhura de reconhecimento)"
+        },
+        "cvsModNone": {
+          "name": "Sem modificação de SVC"
+        },
+        "panoramicTriplex": {
+          "name": "Triplex panorâmico",
+          "note": "Apenas certos veículos de nível 10"
+        },
+        "narrowAngle": {
+          "name": "Dispositivo de observação de ângulo estreito",
+          "note": "Apenas certos veículos de nível 10"
+        },
+        "spotBonusFoliage": {
+          "name": "Bónus de deteção: folhagem",
+          "note": "Melhoria de nível 11"
+        },
+        "spotBonusMovement": {
+          "name": "Bónus de deteção: movimento",
+          "note": "Melhoria de nível 11"
+        }
+      }
+    },
+    "pl": {
+      "label": "Polski",
+      "flag": "🇵🇱",
+      "ui": {
+        "title": "Kalkulator zasięgu widzenia i wykrywania World of Tanks",
+        "subtitle": "Przyjęto dowódcę bazowego ze 100 % kwalifikacji głównej.",
+        "h_vehicle": "Pojazd",
+        "h_qual": "Procent kwalifikacji dowódcy",
+        "h_situational": "Umiejętności sytuacyjne zwiększające kwalifikację dowódcy",
+        "h_flat": "Procentowe premie do zasięgu widzenia",
+        "h_skills": "Umiejętności załogi zwiększające zasięg widzenia",
+        "h_cvs": "Premie systemu wizyjnego dowódcy",
+        "h_modes": "Tryby pojazdu",
+        "h_conceal": "Maskowanie przeciwnika",
+        "l_baseVR": "Bazowy zasięg widzenia (metry)",
+        "l_camo": "Całkowite maskowanie pojazdu przeciwnika (%)",
+        "l_foliage": "Całkowite maskowanie listowia / krzaków (%)",
+        "l_combined": "Łączne maskowanie przeciwnika",
+        "l_viewRange": "Zasięg widzenia",
+        "l_still": "Nieruchomy przeciwnik<br>Wykryty w promieniu",
+        "l_moving": "Poruszający się przeciwnik<br>Wykryty w promieniu",
+        "btn_reset": "Wyczyść wszystkie wybory poniżej",
+        "fn_situational": "Procent umiejętności załogi zwiększa te wartości, jednak do kwalifikacji dowódcy na potrzeby obliczania zasięgu widzenia dodawane są wyłącznie wartości bazowe tych umiejętności. Umiejętności te nie zwiększają umiejętności Zwiad, Świadomość sytuacyjna ani Wyszukiwanie zagrożeń poniżej.",
+        "fn_bush": "Założono, że rzadkie i gęste krzaki dają 25 i 50 % maskowania. Krzaki sumują się, ale nie przekraczają 80 %.",
+        "credit": "Stworzone przez RedshiftOTF",
+        "disclaimer1": "To nie jest oficjalna strona Wargaming ani World of Tanks. Wszystkie obrazy należą do",
+        "disclaimer2": "World of Tanks jest znakiem towarowym",
+        "none_vents": "Brak wentylacji",
+        "none_vision": "Brak optyki i lornetki",
+        "none_irst": "Brak IRST",
+        "cvs_total": "Łącznie",
+        "cvs_moving": "maskowania poruszających się pojazdów",
+        "cvs_foliage": "maskowania pojazdów za listowiem",
+        "cvs_bonuses": "Premie SWD",
+        "cvs_shortMoving": "maskowania w ruchu",
+        "cvs_shortFoliage": "maskowania za listowiem",
+        "cvs_none": "Brak premii SWD",
+        "cvs_noReduction": "Brak redukcji maskowania",
+        "qual_line": "Nowa kwalifikacja dowódcy =",
+        "qual_note": "Umiejętności sytuacyjne dają dowódcy stały, niewzmocniony procent na potrzeby obliczania zasięgu widzenia",
+        "conceal_line": "Nowe maskowanie przeciwnika  =",
+        "conceal_still": "nieruchomo",
+        "conceal_moving": "w ruchu",
+        "conceal_against": "przy",
+        "conceal_vr": "zasięgu widzenia",
+        "err_base": "Wprowadź bazowy zasięg widzenia, aby zobaczyć wynik.",
+        "err_camo": "Wprowadź wartości maskowania od 0 do 100.",
+        "eff_moving": "w ruchu",
+        "eff_foliage": "listowie",
+        "eff_viewRange": "zasięgu widzenia",
+        "lang_note": "Teksty inne niż angielskie zostały wygenerowane przez SI",
+        "lang_note2": "Nazwy umiejętności i wyposażenia mogą różnić się od tych w grze"
+      },
+      "items": {
+        "bia": {
+          "name": "Bracia broni",
+          "note": "Wszyscy członkowie załogi wyszkoleni w 100 %"
+        },
+        "vents": {
+          "name": "Wentylacja"
+        },
+        "ventsSlot": {
+          "name": "Wentylacja (slot wyposażenia)",
+          "note": "Zamontowana w slocie wyposażenia"
+        },
+        "bountyVents": {
+          "name": "Nagrodowa wentylacja"
+        },
+        "bondVents": {
+          "name": "Wentylacja za obligacje"
+        },
+        "ventPurge": {
+          "name": "Dyrektywa Przedmuch wentylacji",
+          "note": "Wymaga wentylacji"
+        },
+        "food": {
+          "name": "Zaopatrzenie (żywność)"
+        },
+        "emergency": {
+          "name": "Sytuacja awaryjna",
+          "note": "15 s po otrzymaniu obrażeń przez Twój pojazd"
+        },
+        "holdTheLine": {
+          "name": "Utrzymać linię",
+          "note": "Gdy drużyna przeciwnika ma co najmniej 3 pojazdy więcej niż Twoja"
+        },
+        "staySharp": {
+          "name": "Zachowaj czujność",
+          "note": "15 s po użyciu apteczki"
+        },
+        "bulletproof": {
+          "name": "Kuloodporny",
+          "note": "Gdy zablokowane obrażenia przekroczą punkty wytrzymałości Twojego pojazdu"
+        },
+        "sideBySide": {
+          "name": "Ramię w ramię",
+          "note": "W promieniu 50 m od sojuszniczego pojazdu tego samego typu"
+        },
+        "communicationsExpert": {
+          "name": "Ekspert łączności",
+          "note": "Gdy obrażenia asystowane przekroczą początkowe punkty wytrzymałości Twojego pojazdu"
+        },
+        "recon": {
+          "name": "Zwiad",
+          "note": "Umiejętność dowódcy"
+        },
+        "situationalAwareness": {
+          "name": "Świadomość sytuacyjna",
+          "note": "Umiejętność radiooperatora"
+        },
+        "threatSearch": {
+          "name": "Wyszukiwanie zagrożeń",
+          "note": "Aktywuje się na 5 sekund po uruchomieniu Szóstego zmysłu"
+        },
+        "fieldMod": {
+          "name": "Modyfikacja polowa (zasięg widzenia)",
+          "note": "Wartość procentowa zależy od pojazdu - sprawdź w grze"
+        },
+        "optics": {
+          "name": "Powlekana optyka"
+        },
+        "opticsSlot": {
+          "name": "Powlekana optyka (slot zwiadowczy)"
+        },
+        "bountyOptics": {
+          "name": "Nagrodowa optyka"
+        },
+        "bondOptics": {
+          "name": "Optyka za obligacje"
+        },
+        "binocs": {
+          "name": "Lornetka",
+          "note": "Dopiero po 3 sekundach postoju"
+        },
+        "binocsSlot": {
+          "name": "Lornetka (slot zwiadowczy)",
+          "note": "Dopiero po 3 sekundach postoju"
+        },
+        "bondBinocs": {
+          "name": "Lornetka za obligacje",
+          "note": "Dopiero po 2 sekundach postoju"
+        },
+        "opticalCalibration": {
+          "name": "Dyrektywa Kalibracja optyki",
+          "note": "Wymaga optyki. Gra podaje 2,5 %; zmierzony efekt to 2,3 %."
+        },
+        "irstBase": {
+          "name": "Tryb IRST (WZ-219) - Podstawowy",
+          "note": "Poziom 11 - nie w pełni ulepszony, najwęższa wiązka"
+        },
+        "irst": {
+          "name": "Tryb IRST (WZ-219) - Ulepszony",
+          "note": "Poziom 11 - w pełni ulepszony, najwęższa wiązka"
+        },
+        "cvsNone": {
+          "name": "Brak SWD"
+        },
+        "cvsStandard": {
+          "name": "System wizyjny dowódcy"
+        },
+        "cvsSlot": {
+          "name": "System wizyjny dowódcy (slot zwiadowczy)"
+        },
+        "cvsModNone": {
+          "name": "Brak modyfikacji SWD"
+        },
+        "panoramicTriplex": {
+          "name": "Peryskop panoramiczny",
+          "note": "Tylko wybrane pojazdy X poziomu"
+        },
+        "narrowAngle": {
+          "name": "Przyrząd obserwacyjny o wąskim kącie",
+          "note": "Tylko wybrane pojazdy X poziomu"
+        },
+        "spotBonusFoliage": {
+          "name": "Premia do wykrywania: listowie",
+          "note": "Ulepszenie XI poziomu"
+        },
+        "spotBonusMovement": {
+          "name": "Premia do wykrywania: ruch",
+          "note": "Ulepszenie XI poziomu"
+        }
+      }
+    },
+    "it": {
+      "label": "Italiano",
+      "flag": "🇮🇹",
+      "ui": {
+        "title": "Calcolatore del raggio visivo e della distanza di avvistamento di World of Tanks",
+        "subtitle": "Si presuppone un comandante base con il 100 % di qualifica principale.",
+        "h_vehicle": "Veicolo",
+        "h_qual": "Percentuale di qualifica del comandante",
+        "h_situational": "Abilità situazionali che aumentano la qualifica del comandante",
+        "h_flat": "Bonus percentuali al raggio visivo",
+        "h_skills": "Abilità dell'equipaggio che aumentano il raggio visivo",
+        "h_cvs": "Bonus del sistema di visione del comandante",
+        "h_modes": "Modalità del veicolo",
+        "h_conceal": "Mimetizzazione nemica",
+        "l_baseVR": "Raggio visivo base (metri)",
+        "l_camo": "Mimetizzazione totale del veicolo nemico (%)",
+        "l_foliage": "Mimetizzazione totale di fogliame / cespugli (%)",
+        "l_combined": "Mimetizzazione nemica combinata",
+        "l_viewRange": "Raggio visivo",
+        "l_still": "Nemico fermo<br>Avvistato entro",
+        "l_moving": "Nemico in movimento<br>Avvistato entro",
+        "btn_reset": "Cancella tutte le selezioni qui sotto",
+        "fn_situational": "La percentuale delle abilità dell'equipaggio aumenta questi valori, ma al comandante vengono sommati solo i valori base di queste abilità ai fini del calcolo del raggio visivo. Queste abilità non potenziano le abilità Ricognizione, Consapevolezza situazionale o Ricerca delle minacce qui sotto.",
+        "fn_bush": "Si presume che i cespugli radi e fitti diano il 25 e il 50 % di mimetizzazione. Più cespugli si sommano ma non superano l'80 %.",
+        "credit": "Creato da RedshiftOTF",
+        "disclaimer1": "Questo non è un sito ufficiale di Wargaming o World of Tanks. Tutte le immagini appartengono a",
+        "disclaimer2": "World of Tanks è un marchio di",
+        "none_vents": "Nessuna ventilazione",
+        "none_vision": "Nessuna ottica né binocolo",
+        "none_irst": "Nessun IRST",
+        "cvs_total": "Totale",
+        "cvs_moving": "di mimetizzazione dei veicoli in movimento",
+        "cvs_foliage": "di mimetizzazione dei veicoli dietro il fogliame",
+        "cvs_bonuses": "Bonus SVC",
+        "cvs_shortMoving": "mimetizzazione in movimento",
+        "cvs_shortFoliage": "mimetizzazione dietro il fogliame",
+        "cvs_none": "Nessun bonus SVC",
+        "cvs_noReduction": "Nessuna riduzione della mimetizzazione",
+        "qual_line": "Nuova qualifica del comandante =",
+        "qual_note": "Le abilità situazionali forniscono al comandante una percentuale fissa, non potenziata, ai fini del calcolo del raggio visivo",
+        "conceal_line": "Nuova mimetizzazione nemica  =",
+        "conceal_still": "da fermo",
+        "conceal_moving": "in movimento",
+        "conceal_against": "contro",
+        "conceal_vr": "di raggio visivo",
+        "err_base": "Inserisci un raggio visivo base per vedere un risultato.",
+        "err_camo": "Inserisci valori di mimetizzazione compresi tra 0 e 100.",
+        "eff_moving": "in movimento",
+        "eff_foliage": "fogliame",
+        "eff_viewRange": "di raggio visivo",
+        "lang_note": "I testi diversi dall'inglese sono generati dall'IA",
+        "lang_note2": "I nomi di abilità ed equipaggiamento possono differire da quelli del gioco"
+      },
+      "items": {
+        "bia": {
+          "name": "Fratelli d'armi",
+          "note": "Tutti i membri dell'equipaggio addestrati al 100 %"
+        },
+        "vents": {
+          "name": "Ventilazione"
+        },
+        "ventsSlot": {
+          "name": "Ventilazione (slot equipaggiamento)",
+          "note": "Montata in uno slot equipaggiamento"
+        },
+        "bountyVents": {
+          "name": "Ventilazione premio"
+        },
+        "bondVents": {
+          "name": "Ventilazione a obbligazioni"
+        },
+        "ventPurge": {
+          "name": "Direttiva Spurgo della ventilazione",
+          "note": "Richiede la ventilazione"
+        },
+        "food": {
+          "name": "Consumabile razioni"
+        },
+        "emergency": {
+          "name": "Emergenza",
+          "note": "15 s dopo che il tuo veicolo ha subito danni"
+        },
+        "holdTheLine": {
+          "name": "Tenere la linea",
+          "note": "Finché la squadra nemica ha almeno 3 veicoli in più della tua"
+        },
+        "staySharp": {
+          "name": "Restare vigili",
+          "note": "15 s dopo l'uso di un kit di pronto soccorso"
+        },
+        "bulletproof": {
+          "name": "A prova di proiettile",
+          "note": "Quando i danni bloccati superano i punti struttura del tuo veicolo"
+        },
+        "sideBySide": {
+          "name": "Fianco a fianco",
+          "note": "Entro 50 m da un veicolo alleato dello stesso tipo"
+        },
+        "communicationsExpert": {
+          "name": "Esperto di comunicazioni",
+          "note": "Quando i danni assistiti superano i punti struttura iniziali del tuo veicolo"
+        },
+        "recon": {
+          "name": "Ricognizione",
+          "note": "Abilità del comandante"
+        },
+        "situationalAwareness": {
+          "name": "Consapevolezza situazionale",
+          "note": "Abilità dell'operatore radio"
+        },
+        "threatSearch": {
+          "name": "Ricerca delle minacce",
+          "note": "Si attiva per 5 secondi allo scattare del Sesto senso"
+        },
+        "fieldMod": {
+          "name": "Modifica sul campo (raggio visivo)",
+          "note": "La percentuale varia in base al veicolo - da verificare nel gioco"
+        },
+        "optics": {
+          "name": "Ottiche rivestite"
+        },
+        "opticsSlot": {
+          "name": "Ottiche rivestite (slot ricognizione)"
+        },
+        "bountyOptics": {
+          "name": "Ottiche premio"
+        },
+        "bondOptics": {
+          "name": "Ottiche a obbligazioni"
+        },
+        "binocs": {
+          "name": "Binocolo",
+          "note": "Solo dopo 3 secondi da fermo"
+        },
+        "binocsSlot": {
+          "name": "Binocolo (slot ricognizione)",
+          "note": "Solo dopo 3 secondi da fermo"
+        },
+        "bondBinocs": {
+          "name": "Binocolo a obbligazioni",
+          "note": "Solo dopo 2 secondi da fermo"
+        },
+        "opticalCalibration": {
+          "name": "Direttiva Calibrazione ottica",
+          "note": "Richiede le ottiche. Il gioco indica 2,5 %; l'effetto misurato è 2,3 %."
+        },
+        "irstBase": {
+          "name": "Modalità IRST (WZ-219) - Base",
+          "note": "Livello 11 - non completamente potenziata, fascio più stretto"
+        },
+        "irst": {
+          "name": "Modalità IRST (WZ-219) - Potenziata",
+          "note": "Livello 11 - completamente potenziata, fascio più stretto"
+        },
+        "cvsNone": {
+          "name": "Nessun SVC"
+        },
+        "cvsStandard": {
+          "name": "Sistema di visione del comandante"
+        },
+        "cvsSlot": {
+          "name": "Sistema di visione del comandante (slot ricognizione)"
+        },
+        "cvsModNone": {
+          "name": "Nessuna modifica SVC"
+        },
+        "panoramicTriplex": {
+          "name": "Triplex panoramico",
+          "note": "Solo alcuni veicoli di livello 10"
+        },
+        "narrowAngle": {
+          "name": "Dispositivo di osservazione ad angolo stretto",
+          "note": "Solo alcuni veicoli di livello 10"
+        },
+        "spotBonusFoliage": {
+          "name": "Bonus di avvistamento: fogliame",
+          "note": "Potenziamento di livello 11"
+        },
+        "spotBonusMovement": {
+          "name": "Bonus di avvistamento: movimento",
+          "note": "Potenziamento di livello 11"
+        }
+      }
+    },
+    "cs": {
+      "label": "Čeština",
+      "flag": "🇨🇿",
+      "ui": {
+        "title": "Kalkulátor výhledu a dosahu odhalení pro World of Tanks",
+        "subtitle": "Předpokládá se základní velitel se 100 % hlavní kvalifikace.",
+        "h_vehicle": "Vozidlo",
+        "h_qual": "Procento kvalifikace velitele",
+        "h_situational": "Situační dovednosti zvyšující kvalifikaci velitele",
+        "h_flat": "Procentní bonusy k výhledu",
+        "h_skills": "Dovednosti posádky zvyšující výhled",
+        "h_cvs": "Bonusy velitelského systému vidění",
+        "h_modes": "Režimy vozidla",
+        "h_conceal": "Maskování nepřítele",
+        "l_baseVR": "Základní výhled (metry)",
+        "l_camo": "Celkové maskování nepřátelského vozidla (%)",
+        "l_foliage": "Celkové maskování listoví / keřů (%)",
+        "l_combined": "Celkové maskování nepřítele",
+        "l_viewRange": "Výhled",
+        "l_still": "Stojící nepřítel<br>Odhalen do",
+        "l_moving": "Pohybující se nepřítel<br>Odhalen do",
+        "btn_reset": "Vymazat všechny volby níže",
+        "fn_situational": "Procento dovedností posádky tyto hodnoty zvyšuje, ale pro výpočet výhledu se k veliteli přičítají pouze základní hodnoty těchto dovedností. Tyto dovednosti nezvyšují dovednosti Průzkum, Situační přehled ani Vyhledávání hrozeb níže.",
+        "fn_bush": "Předpokládá se, že řídké a husté keře dávají 25 a 50 % maskování. Více keřů se sčítá, ale nepřekročí 80 %.",
+        "credit": "Vytvořil RedshiftOTF",
+        "disclaimer1": "Toto není oficiální web Wargaming ani World of Tanks. Všechny obrázky patří",
+        "disclaimer2": "World of Tanks je ochranná známka",
+        "none_vents": "Bez ventilace",
+        "none_vision": "Bez optiky a dalekohledu",
+        "none_irst": "Bez IRST",
+        "cvs_total": "Celkem",
+        "cvs_moving": "maskování pohybujících se vozidel",
+        "cvs_foliage": "maskování vozidel za listovím",
+        "cvs_bonuses": "Bonusy VSV",
+        "cvs_shortMoving": "maskování v pohybu",
+        "cvs_shortFoliage": "maskování za listovím",
+        "cvs_none": "Žádné bonusy VSV",
+        "cvs_noReduction": "Žádné snížení maskování",
+        "qual_line": "Nová kvalifikace velitele =",
+        "qual_note": "Situační dovednosti dávají veliteli pevné, nezvýšené procento pro výpočet výhledu",
+        "conceal_line": "Nové maskování nepřítele  =",
+        "conceal_still": "ve stoje",
+        "conceal_moving": "v pohybu",
+        "conceal_against": "proti",
+        "conceal_vr": "výhledu",
+        "err_base": "Zadejte základní výhled, aby se zobrazil výsledek.",
+        "err_camo": "Zadejte hodnoty maskování mezi 0 a 100.",
+        "eff_moving": "v pohybu",
+        "eff_foliage": "listoví",
+        "eff_viewRange": "výhledu",
+        "lang_note": "Texty jiné než anglické jsou generovány umělou inteligencí",
+        "lang_note2": "Názvy dovedností a vybavení se mohou lišit od názvů ve hře"
+      },
+      "items": {
+        "bia": {
+          "name": "Bratři ve zbrani",
+          "note": "Všichni členové posádky vycvičeni na 100 %"
+        },
+        "vents": {
+          "name": "Ventilace"
+        },
+        "ventsSlot": {
+          "name": "Ventilace (slot vybavení)",
+          "note": "Namontovaná ve slotu vybavení"
+        },
+        "bountyVents": {
+          "name": "Prémiová ventilace"
+        },
+        "bondVents": {
+          "name": "Ventilace za dluhopisy"
+        },
+        "ventPurge": {
+          "name": "Direktiva Profoukání ventilace",
+          "note": "Vyžaduje ventilaci"
+        },
+        "food": {
+          "name": "Spotřební příděly"
+        },
+        "emergency": {
+          "name": "Nouzový stav",
+          "note": "15 s poté, co vaše vozidlo utrpí poškození"
+        },
+        "holdTheLine": {
+          "name": "Držet linii",
+          "note": "Dokud má nepřátelský tým alespoň o 3 vozidla více než váš"
+        },
+        "staySharp": {
+          "name": "Zůstat ostražitý",
+          "note": "15 s po použití lékárničky"
+        },
+        "bulletproof": {
+          "name": "Neprůstřelný",
+          "note": "Jakmile zablokované poškození překročí body výdrže vašeho vozidla"
+        },
+        "sideBySide": {
+          "name": "Bok po boku",
+          "note": "Do 50 m od spojeneckého vozidla stejného typu"
+        },
+        "communicationsExpert": {
+          "name": "Expert na komunikaci",
+          "note": "Jakmile asistované poškození překročí počáteční body výdrže vašeho vozidla"
+        },
+        "recon": {
+          "name": "Průzkum",
+          "note": "Dovednost velitele"
+        },
+        "situationalAwareness": {
+          "name": "Situační přehled",
+          "note": "Dovednost radisty"
+        },
+        "threatSearch": {
+          "name": "Vyhledávání hrozeb",
+          "note": "Aktivuje se na 5 sekund při spuštění Šestého smyslu"
+        },
+        "fieldMod": {
+          "name": "Polní úprava (výhled)",
+          "note": "Procento se liší podle vozidla - ověřte ve hře"
+        },
+        "optics": {
+          "name": "Potažená optika"
+        },
+        "opticsSlot": {
+          "name": "Potažená optika (průzkumný slot)"
+        },
+        "bountyOptics": {
+          "name": "Prémiová optika"
+        },
+        "bondOptics": {
+          "name": "Optika za dluhopisy"
+        },
+        "binocs": {
+          "name": "Binokulární dalekohled",
+          "note": "Až po 3 sekundách stání"
+        },
+        "binocsSlot": {
+          "name": "Binokulární dalekohled (průzkumný slot)",
+          "note": "Až po 3 sekundách stání"
+        },
+        "bondBinocs": {
+          "name": "Binokulární dalekohled za dluhopisy",
+          "note": "Až po 2 sekundách stání"
+        },
+        "opticalCalibration": {
+          "name": "Direktiva Kalibrace optiky",
+          "note": "Vyžaduje optiku. Hra uvádí 2,5 %; naměřený účinek je 2,3 %."
+        },
+        "irstBase": {
+          "name": "Režim IRST (WZ-219) - Základní",
+          "note": "Úroveň 11 - není plně vylepšený, nejužší paprsek"
+        },
+        "irst": {
+          "name": "Režim IRST (WZ-219) - Vylepšený",
+          "note": "Úroveň 11 - plně vylepšený, nejužší paprsek"
+        },
+        "cvsNone": {
+          "name": "Bez VSV"
+        },
+        "cvsStandard": {
+          "name": "Velitelský systém vidění"
+        },
+        "cvsSlot": {
+          "name": "Velitelský systém vidění (průzkumný slot)"
+        },
+        "cvsModNone": {
+          "name": "Bez úpravy VSV"
+        },
+        "panoramicTriplex": {
+          "name": "Panoramatický triplex",
+          "note": "Pouze některá vozidla 10. úrovně"
+        },
+        "narrowAngle": {
+          "name": "Pozorovací zařízení s úzkým úhlem",
+          "note": "Pouze některá vozidla 10. úrovně"
+        },
+        "spotBonusFoliage": {
+          "name": "Bonus k odhalení: listoví",
+          "note": "Vylepšení 11. úrovně"
+        },
+        "spotBonusMovement": {
+          "name": "Bonus k odhalení: pohyb",
+          "note": "Vylepšení 11. úrovně"
+        }
+      }
+    },
+    "uk": {
+      "label": "Українська",
+      "flag": "🇺🇦",
+      "ui": {
+        "title": "Калькулятор огляду та дальності виявлення World of Tanks",
+        "subtitle": "Припускається базовий командир зі 100 % основної кваліфікації.",
+        "h_vehicle": "Машина",
+        "h_qual": "Відсоток кваліфікації командира",
+        "h_situational": "Ситуаційні навички, що підвищують кваліфікацію командира",
+        "h_flat": "Відсоткові бонуси до огляду",
+        "h_skills": "Навички екіпажу, що підвищують огляд",
+        "h_cvs": "Бонуси системи бачення командира",
+        "h_modes": "Режими машини",
+        "h_conceal": "Маскування суперника",
+        "l_baseVR": "Базовий огляд (метри)",
+        "l_camo": "Загальне маскування ворожої машини (%)",
+        "l_foliage": "Загальне маскування листя / кущів (%)",
+        "l_combined": "Сукупне маскування суперника",
+        "l_viewRange": "Огляд",
+        "l_still": "Нерухомий суперник<br>Виявлення в межах",
+        "l_moving": "Рухомий суперник<br>Виявлення в межах",
+        "btn_reset": "Очистити всі вибори нижче",
+        "fn_situational": "Відсоток навичок екіпажу підвищує ці значення, проте для розрахунку огляду до командира додаються лише базові значення цих навичок. Ці навички не підсилюють навички Розвідка, Ситуаційна обізнаність чи Пошук загроз нижче.",
+        "fn_bush": "Припускається, що рідкі та густі кущі дають 25 і 50 % маскування. Кущі додаються, але не перевищують 80 %.",
+        "credit": "Створено RedshiftOTF",
+        "disclaimer1": "Це не офіційний сайт Wargaming чи World of Tanks. Усі зображення належать",
+        "disclaimer2": "World of Tanks є торговою маркою",
+        "none_vents": "Без вентиляції",
+        "none_vision": "Без оптики та бінокуляра",
+        "none_irst": "Без IRST",
+        "cvs_total": "Разом",
+        "cvs_moving": "маскування рухомих машин",
+        "cvs_foliage": "маскування машин за листям",
+        "cvs_bonuses": "Бонуси СБК",
+        "cvs_shortMoving": "маскування в русі",
+        "cvs_shortFoliage": "маскування за листям",
+        "cvs_none": "Без бонусів СБК",
+        "cvs_noReduction": "Без зниження маскування",
+        "qual_line": "Нова кваліфікація командира =",
+        "qual_note": "Ситуаційні навички дають командиру фіксований, непідсилений відсоток для розрахунку огляду",
+        "conceal_line": "Нове маскування суперника  =",
+        "conceal_still": "нерухомо",
+        "conceal_moving": "у русі",
+        "conceal_against": "проти",
+        "conceal_vr": "огляду",
+        "err_base": "Введіть базовий огляд, щоб побачити результат.",
+        "err_camo": "Введіть значення маскування від 0 до 100.",
+        "eff_moving": "у русі",
+        "eff_foliage": "листя",
+        "eff_viewRange": "огляду",
+        "lang_note": "Тексти, відмінні від англійської, згенеровані ШІ",
+        "lang_note2": "Назви навичок та обладнання можуть відрізнятися від ігрових"
+      },
+      "items": {
+        "bia": {
+          "name": "Бойове братерство",
+          "note": "Усі члени екіпажу навчені на 100 %"
+        },
+        "vents": {
+          "name": "Вентиляція"
+        },
+        "ventsSlot": {
+          "name": "Вентиляція (слот обладнання)",
+          "note": "Встановлена у слоті обладнання"
+        },
+        "bountyVents": {
+          "name": "Преміальна вентиляція"
+        },
+        "bondVents": {
+          "name": "Вентиляція за бони"
+        },
+        "ventPurge": {
+          "name": "Директива Продування вентиляції",
+          "note": "Потребує вентиляції"
+        },
+        "food": {
+          "name": "Витратний пайок"
+        },
+        "emergency": {
+          "name": "Надзвичайна ситуація",
+          "note": "15 с після того, як ваша машина зазнала пошкоджень"
+        },
+        "holdTheLine": {
+          "name": "Тримати лінію",
+          "note": "Поки команда суперника має щонайменше на 3 машини більше за вашу"
+        },
+        "staySharp": {
+          "name": "Залишатися пильним",
+          "note": "15 с після використання аптечки"
+        },
+        "bulletproof": {
+          "name": "Куленепробивний",
+          "note": "Коли заблокована шкода перевищує запас міцності вашої машини"
+        },
+        "sideBySide": {
+          "name": "Пліч-о-пліч",
+          "note": "У межах 50 м від союзної машини того самого типу"
+        },
+        "communicationsExpert": {
+          "name": "Експерт зі зв'язку",
+          "note": "Коли шкода за сприяння перевищує початковий запас міцності вашої машини"
+        },
+        "recon": {
+          "name": "Розвідка",
+          "note": "Навичка командира"
+        },
+        "situationalAwareness": {
+          "name": "Ситуаційна обізнаність",
+          "note": "Навичка радиста"
+        },
+        "threatSearch": {
+          "name": "Пошук загроз",
+          "note": "Активується на 5 секунд після спрацювання Шостого чуття"
+        },
+        "fieldMod": {
+          "name": "Польова модифікація (огляд)",
+          "note": "Відсоток залежить від машини - перевірте у грі"
+        },
+        "optics": {
+          "name": "Просвітлена оптика"
+        },
+        "opticsSlot": {
+          "name": "Просвітлена оптика (розвідувальний слот)"
+        },
+        "bountyOptics": {
+          "name": "Преміальна оптика"
+        },
+        "bondOptics": {
+          "name": "Оптика за бони"
+        },
+        "binocs": {
+          "name": "Бінокуляр",
+          "note": "Лише після 3 секунд на місці"
+        },
+        "binocsSlot": {
+          "name": "Бінокуляр (розвідувальний слот)",
+          "note": "Лише після 3 секунд на місці"
+        },
+        "bondBinocs": {
+          "name": "Бінокуляр за бони",
+          "note": "Лише після 2 секунд на місці"
+        },
+        "opticalCalibration": {
+          "name": "Директива Калібрування оптики",
+          "note": "Потребує оптики. Гра показує 2,5 %; виміряний ефект — 2,3 %."
+        },
+        "irstBase": {
+          "name": "Режим IRST (WZ-219) - Базовий",
+          "note": "11 рівень - не повністю покращений, найвужчий промінь"
+        },
+        "irst": {
+          "name": "Режим IRST (WZ-219) - Покращений",
+          "note": "11 рівень - повністю покращений, найвужчий промінь"
+        },
+        "cvsNone": {
+          "name": "Без СБК"
+        },
+        "cvsStandard": {
+          "name": "Система бачення командира"
+        },
+        "cvsSlot": {
+          "name": "Система бачення командира (розвідувальний слот)"
+        },
+        "cvsModNone": {
+          "name": "Без модифікації СБК"
+        },
+        "panoramicTriplex": {
+          "name": "Панорамний триплекс",
+          "note": "Лише певні машини 10 рівня"
+        },
+        "narrowAngle": {
+          "name": "Вузькокутний прилад спостереження",
+          "note": "Лише певні машини 10 рівня"
+        },
+        "spotBonusFoliage": {
+          "name": "Бонус до виявлення: листя",
+          "note": "Покращення 11 рівня"
+        },
+        "spotBonusMovement": {
+          "name": "Бонус до виявлення: рух",
+          "note": "Покращення 11 рівня"
+        }
+      }
+    },
+    "hu": {
+      "label": "Magyar",
+      "flag": "🇭🇺",
+      "ui": {
+        "title": "World of Tanks látótávolság- és felderítési távolság-kalkulátor",
+        "subtitle": "Az alap parancsnok 100 %-os fő szakképzettséggel számolva.",
+        "h_vehicle": "Jármű",
+        "h_qual": "A parancsnok szakképzettsége százalékban",
+        "h_situational": "Helyzetfüggő képességek, amelyek növelik a parancsnok szakképzettségét",
+        "h_flat": "Százalékos látótávolság-bónuszok",
+        "h_skills": "Személyzeti képességek, amelyek növelik a látótávolságot",
+        "h_cvs": "A parancsnoki látórendszer bónuszai",
+        "h_modes": "Jármű üzemmódok",
+        "h_conceal": "Ellenséges álcázás",
+        "l_baseVR": "Alap látótávolság (méter)",
+        "l_camo": "Az ellenséges jármű teljes álcázása (%)",
+        "l_foliage": "Lombozat / bokrok teljes álcázása (%)",
+        "l_combined": "Összesített ellenséges álcázás",
+        "l_viewRange": "Látótávolság",
+        "l_still": "Álló ellenség<br>Felderítve ezen belül",
+        "l_moving": "Mozgó ellenség<br>Felderítve ezen belül",
+        "btn_reset": "Az alábbi kijelölések törlése",
+        "fn_situational": "A személyzeti képességek százaléka növeli ezeket az értékeket, de a látótávolság kiszámításakor csak e képességek alapértékei adódnak hozzá a parancsnokhoz. Ezek a képességek nem növelik az alábbi Felderítés, Helyzetfelismerés vagy Fenyegetéskeresés képességeket.",
+        "fn_bush": "Feltételezve, hogy a ritka és sűrű bokrok 25 és 50 % álcázást adnak. Több bokor összeadódik, de nem haladja meg a 80 %-ot.",
+        "credit": "Készítette: RedshiftOTF",
+        "disclaimer1": "Ez nem hivatalos Wargaming vagy World of Tanks weboldal. Minden kép tulajdonosa a",
+        "disclaimer2": "A World of Tanks a következő védjegye:",
+        "none_vents": "Nincs szellőzés",
+        "none_vision": "Nincs optika vagy távcső",
+        "none_irst": "Nincs IRST",
+        "cvs_total": "Összesen",
+        "cvs_moving": "álcázás mozgó járműveknél",
+        "cvs_foliage": "álcázás lombozat mögötti járműveknél",
+        "cvs_bonuses": "PLR-bónuszok",
+        "cvs_shortMoving": "álcázás mozgás közben",
+        "cvs_shortFoliage": "álcázás lombozat mögött",
+        "cvs_none": "Nincsenek PLR-bónuszok",
+        "cvs_noReduction": "Nincs álcázáscsökkentés",
+        "qual_line": "Új parancsnoki szakképzettség =",
+        "qual_note": "A helyzetfüggő képességek fix, nem növelt százalékot adnak a parancsnoknak a látótávolság kiszámításához",
+        "conceal_line": "Új ellenséges álcázás  =",
+        "conceal_still": "állva",
+        "conceal_moving": "mozgásban",
+        "conceal_against": "ellenében",
+        "conceal_vr": "látótávolság",
+        "err_base": "Adj meg egy alap látótávolságot az eredmény megjelenítéséhez.",
+        "err_camo": "Adj meg 0 és 100 közötti álcázási értékeket.",
+        "eff_moving": "mozgás",
+        "eff_foliage": "lombozat",
+        "eff_viewRange": "látótávolság",
+        "lang_note": "Az angoltól eltérő szövegeket mesterséges intelligencia hozta létre",
+        "lang_note2": "A képességek és felszerelések nevei eltérhetnek a játékban láthatóaktól"
+      },
+      "items": {
+        "bia": {
+          "name": "Bajtársiasság",
+          "note": "A teljes személyzet 100 %-ra kiképezve"
+        },
+        "vents": {
+          "name": "Szellőzés"
+        },
+        "ventsSlot": {
+          "name": "Szellőzés (felszerelési hely)",
+          "note": "Felszerelési helyre szerelve"
+        },
+        "bountyVents": {
+          "name": "Jutalom szellőzés"
+        },
+        "bondVents": {
+          "name": "Kötvényes szellőzés"
+        },
+        "ventPurge": {
+          "name": "Direktíva: Szellőzés átöblítése",
+          "note": "Szellőzést igényel"
+        },
+        "food": {
+          "name": "Élelmiszer fogyóeszköz"
+        },
+        "emergency": {
+          "name": "Vészhelyzet",
+          "note": "15 mp-ig, miután a járműved sérülést szenvedett"
+        },
+        "holdTheLine": {
+          "name": "Tartsd a vonalat",
+          "note": "Amíg az ellenséges csapatnak legalább 3 járművel több van, mint a tiédnek"
+        },
+        "staySharp": {
+          "name": "Maradj éber",
+          "note": "15 mp-ig elsősegélycsomag használata után"
+        },
+        "bulletproof": {
+          "name": "Golyóálló",
+          "note": "Ha a felfogott sebzés meghaladja a járműved páncélzatpontjait"
+        },
+        "sideBySide": {
+          "name": "Egymás mellett",
+          "note": "50 m-en belül egy azonos típusú szövetséges járműtől"
+        },
+        "communicationsExpert": {
+          "name": "Kommunikációs szakértő",
+          "note": "Ha az asszisztált sebzés meghaladja a járműved kezdeti páncélzatpontjait"
+        },
+        "recon": {
+          "name": "Felderítés",
+          "note": "Parancsnoki képesség"
+        },
+        "situationalAwareness": {
+          "name": "Helyzetfelismerés",
+          "note": "Rádiós képesség"
+        },
+        "threatSearch": {
+          "name": "Fenyegetéskeresés",
+          "note": "A Hatodik érzék aktiválódása után 5 másodpercig aktív"
+        },
+        "fieldMod": {
+          "name": "Tereptani módosítás (látótávolság)",
+          "note": "A százalék járművenként eltér - ellenőrizd a játékban"
+        },
+        "optics": {
+          "name": "Bevonatos optika"
+        },
+        "opticsSlot": {
+          "name": "Bevonatos optika (felderítő hely)"
+        },
+        "bountyOptics": {
+          "name": "Jutalom optika"
+        },
+        "bondOptics": {
+          "name": "Kötvényes optika"
+        },
+        "binocs": {
+          "name": "Távcső",
+          "note": "Csak 3 másodperc állás után"
+        },
+        "binocsSlot": {
+          "name": "Távcső (felderítő hely)",
+          "note": "Csak 3 másodperc állás után"
+        },
+        "bondBinocs": {
+          "name": "Kötvényes távcső",
+          "note": "Csak 2 másodperc állás után"
+        },
+        "opticalCalibration": {
+          "name": "Direktíva: Optikai kalibrálás",
+          "note": "Optikát igényel. A játék 2,5 %-ot jelez; a mért hatás 2,3 %."
+        },
+        "irstBase": {
+          "name": "IRST mód (WZ-219) - Alap",
+          "note": "11. szint - nem teljesen fejlesztve, legkeskenyebb nyaláb"
+        },
+        "irst": {
+          "name": "IRST mód (WZ-219) - Fejlesztett",
+          "note": "11. szint - teljesen fejlesztve, legkeskenyebb nyaláb"
+        },
+        "cvsNone": {
+          "name": "Nincs PLR"
+        },
+        "cvsStandard": {
+          "name": "Parancsnoki látórendszer"
+        },
+        "cvsSlot": {
+          "name": "Parancsnoki látórendszer (felderítő hely)"
+        },
+        "cvsModNone": {
+          "name": "Nincs PLR-módosítás"
+        },
+        "panoramicTriplex": {
+          "name": "Panorámás triplex",
+          "note": "Csak bizonyos 10. szintű járművek"
+        },
+        "narrowAngle": {
+          "name": "Szűk látószögű megfigyelő eszköz",
+          "note": "Csak bizonyos 10. szintű járművek"
+        },
+        "spotBonusFoliage": {
+          "name": "Felderítési bónusz: lombozat",
+          "note": "11. szintű fejlesztés"
+        },
+        "spotBonusMovement": {
+          "name": "Felderítési bónusz: mozgás",
+          "note": "11. szintű fejlesztés"
+        }
+      }
+    },
+    "zh": {
+      "label": "简体中文 (Mandarin)",
+      "flag": "🇨🇳",
+      "ui": {
+        "title": "坦克世界 视野与侦察距离计算器",
+        "subtitle": "假设基础车长的主要资质为100%。",
+        "h_vehicle": "车辆",
+        "h_qual": "车长资质百分比",
+        "h_situational": "提升车长资质的情境技能",
+        "h_flat": "视野百分比加成",
+        "h_skills": "提升视野百分比的乘员技能",
+        "h_cvs": "车长视觉系统加成",
+        "h_modes": "车辆模式",
+        "h_conceal": "敌方隐蔽",
+        "l_baseVR": "基础视野（米）",
+        "l_camo": "敌方车辆总隐蔽值（%）",
+        "l_foliage": "植被／灌木总隐蔽值（%）",
+        "l_combined": "敌方综合隐蔽值",
+        "l_viewRange": "视野",
+        "l_still": "静止的敌人<br>侦察距离",
+        "l_moving": "移动中的敌人<br>侦察距离",
+        "btn_reset": "清除下方所有选项",
+        "fn_situational": "乘员技能百分比会提升这些数值，但在计算视野时，只有这些技能的基础数值会加到车长身上。这些技能不会提升下方的侦察、态势感知或威胁搜索技能。",
+        "fn_bush": "假设稀疏和茂密灌木分别提供25%和50%隐蔽。多丛灌木可叠加，但不超过80%。",
+        "credit": "由 RedshiftOTF 制作",
+        "disclaimer1": "本网站并非 Wargaming 或坦克世界的官方网站。所有图片版权归",
+        "disclaimer2": "坦克世界是以下公司的商标：",
+        "none_vents": "无通风设备",
+        "none_vision": "无光学仪或望远镜",
+        "none_irst": "无 IRST",
+        "cvs_total": "合计",
+        "cvs_moving": "移动车辆的隐蔽值",
+        "cvs_foliage": "植被后车辆的隐蔽值",
+        "cvs_bonuses": "车长视觉系统加成",
+        "cvs_shortMoving": "移动时隐蔽值",
+        "cvs_shortFoliage": "植被后隐蔽值",
+        "cvs_none": "无车长视觉系统加成",
+        "cvs_noReduction": "无隐蔽削减",
+        "qual_line": "新的车长资质 =",
+        "qual_note": "在计算视野时，情境技能为车长提供固定且不受加成的百分比",
+        "conceal_line": "新的敌方隐蔽值  =",
+        "conceal_still": "静止",
+        "conceal_moving": "移动",
+        "conceal_against": "对应",
+        "conceal_vr": "视野",
+        "err_base": "请输入基础视野以查看结果。",
+        "err_camo": "请输入0到100之间的隐蔽值。",
+        "eff_moving": "移动",
+        "eff_foliage": "植被",
+        "eff_viewRange": "视野",
+        "lang_note": "非英语文本由人工智能生成",
+        "lang_note2": "技能与装备名称可能与游戏内的描述不同"
+      },
+      "items": {
+        "bia": {
+          "name": "战友情谊",
+          "note": "全体乘员训练至100%"
+        },
+        "vents": {
+          "name": "通风设备"
+        },
+        "ventsSlot": {
+          "name": "通风设备（装备槽）",
+          "note": "安装在装备槽中"
+        },
+        "bountyVents": {
+          "name": "赏金通风设备"
+        },
+        "bondVents": {
+          "name": "债券通风设备"
+        },
+        "ventPurge": {
+          "name": "指令：通风清洗",
+          "note": "需要装备通风设备"
+        },
+        "food": {
+          "name": "食品消耗品"
+        },
+        "emergency": {
+          "name": "紧急状况",
+          "note": "车辆受到伤害后的15秒内"
+        },
+        "holdTheLine": {
+          "name": "坚守阵线",
+          "note": "当敌方队伍比己方多至少3辆车时"
+        },
+        "staySharp": {
+          "name": "保持警觉",
+          "note": "使用急救箱后的15秒内"
+        },
+        "bulletproof": {
+          "name": "防弹",
+          "note": "当格挡伤害超过本车血量时"
+        },
+        "sideBySide": {
+          "name": "并肩作战",
+          "note": "距离同类型友方车辆50米以内"
+        },
+        "communicationsExpert": {
+          "name": "通讯专家",
+          "note": "当协助伤害超过本车初始血量时"
+        },
+        "recon": {
+          "name": "侦察",
+          "note": "车长技能"
+        },
+        "situationalAwareness": {
+          "name": "态势感知",
+          "note": "无线电操作员技能"
+        },
+        "threatSearch": {
+          "name": "威胁搜索",
+          "note": "第六感触发后启动5秒"
+        },
+        "fieldMod": {
+          "name": "战地改装（视野）",
+          "note": "百分比因车辆而异，请在游戏中确认"
+        },
+        "optics": {
+          "name": "镀膜光学仪"
+        },
+        "opticsSlot": {
+          "name": "镀膜光学仪（侦察槽）"
+        },
+        "bountyOptics": {
+          "name": "赏金光学仪"
+        },
+        "bondOptics": {
+          "name": "债券光学仪"
+        },
+        "binocs": {
+          "name": "双筒望远镜",
+          "note": "静止3秒后生效"
+        },
+        "binocsSlot": {
+          "name": "双筒望远镜（侦察槽）",
+          "note": "静止3秒后生效"
+        },
+        "bondBinocs": {
+          "name": "债券双筒望远镜",
+          "note": "静止2秒后生效"
+        },
+        "opticalCalibration": {
+          "name": "指令：光学校准",
+          "note": "需要装备光学仪。游戏显示为2.5%，实测效果为2.3%。"
+        },
+        "irstBase": {
+          "name": "IRST模式（WZ-219）- 基础",
+          "note": "11级 - 未完全升级，最窄光束"
+        },
+        "irst": {
+          "name": "IRST模式（WZ-219）- 已升级",
+          "note": "11级 - 完全升级，最窄光束"
+        },
+        "cvsNone": {
+          "name": "无车长视觉系统"
+        },
+        "cvsStandard": {
+          "name": "车长视觉系统"
+        },
+        "cvsSlot": {
+          "name": "车长视觉系统（侦察槽）"
+        },
+        "cvsModNone": {
+          "name": "无车长视觉系统改装"
+        },
+        "panoramicTriplex": {
+          "name": "全景潜望镜",
+          "note": "仅限部分10级车辆"
+        },
+        "narrowAngle": {
+          "name": "窄角观察装置",
+          "note": "仅限部分10级车辆"
+        },
+        "spotBonusFoliage": {
+          "name": "侦察加成：植被",
+          "note": "11级升级"
+        },
+        "spotBonusMovement": {
+          "name": "侦察加成：移动",
+          "note": "11级升级"
+        }
+      }
+    },
+    "zh-Hant": {
+      "label": "繁體中文 (Cantonese)",
+      "flag": "🇭🇰",
+      "ui": {
+        "title": "戰車世界 視野與偵察距離計算器",
+        "subtitle": "假設基礎車長的主要資質為100%。",
+        "h_vehicle": "車輛",
+        "h_qual": "車長資質百分比",
+        "h_situational": "提升車長資質的情境技能",
+        "h_flat": "視野百分比加成",
+        "h_skills": "提升視野百分比的乘員技能",
+        "h_cvs": "車長視覺系統加成",
+        "h_modes": "車輛模式",
+        "h_conceal": "敵方隱蔽",
+        "l_baseVR": "基礎視野（公尺）",
+        "l_camo": "敵方車輛總隱蔽值（%）",
+        "l_foliage": "植被／灌木總隱蔽值（%）",
+        "l_combined": "敵方綜合隱蔽值",
+        "l_viewRange": "視野",
+        "l_still": "靜止的敵人<br>偵察距離",
+        "l_moving": "移動中的敵人<br>偵察距離",
+        "btn_reset": "清除下方所有選項",
+        "fn_situational": "乘員技能百分比會提升這些數值，但在計算視野時，只有這些技能的基礎數值會加到車長身上。這些技能不會提升下方的偵察、態勢感知或威脅搜索技能。",
+        "fn_bush": "假設稀疏和茂密灌木分別提供25%和50%隱蔽。多叢灌木可疊加，但不超過80%。",
+        "credit": "由 RedshiftOTF 製作",
+        "disclaimer1": "本網站並非 Wargaming 或戰車世界的官方網站。所有圖片版權歸",
+        "disclaimer2": "戰車世界是以下公司的商標：",
+        "none_vents": "無通風設備",
+        "none_vision": "無光學儀或望遠鏡",
+        "none_irst": "無 IRST",
+        "cvs_total": "合計",
+        "cvs_moving": "移動車輛的隱蔽值",
+        "cvs_foliage": "植被後車輛的隱蔽值",
+        "cvs_bonuses": "車長視覺系統加成",
+        "cvs_shortMoving": "移動時隱蔽值",
+        "cvs_shortFoliage": "植被後隱蔽值",
+        "cvs_none": "無車長視覺系統加成",
+        "cvs_noReduction": "無隱蔽削減",
+        "qual_line": "新的車長資質 =",
+        "qual_note": "在計算視野時，情境技能為車長提供固定且不受加成的百分比",
+        "conceal_line": "新的敵方隱蔽值  =",
+        "conceal_still": "靜止",
+        "conceal_moving": "移動",
+        "conceal_against": "對應",
+        "conceal_vr": "視野",
+        "err_base": "請輸入基礎視野以查看結果。",
+        "err_camo": "請輸入0到100之間的隱蔽值。",
+        "eff_moving": "移動",
+        "eff_foliage": "植被",
+        "eff_viewRange": "視野",
+        "lang_note": "非英語文本由人工智慧生成",
+        "lang_note2": "技能與裝備名稱可能與遊戲內的描述不同"
+      },
+      "items": {
+        "bia": {
+          "name": "戰友情誼",
+          "note": "全體乘員訓練至100%"
+        },
+        "vents": {
+          "name": "通風設備"
+        },
+        "ventsSlot": {
+          "name": "通風設備（裝備欄）",
+          "note": "安裝在裝備欄中"
+        },
+        "bountyVents": {
+          "name": "賞金通風設備"
+        },
+        "bondVents": {
+          "name": "債券通風設備"
+        },
+        "ventPurge": {
+          "name": "指令：通風清洗",
+          "note": "需要裝備通風設備"
+        },
+        "food": {
+          "name": "食品消耗品"
+        },
+        "emergency": {
+          "name": "緊急狀況",
+          "note": "車輛受到傷害後的15秒內"
+        },
+        "holdTheLine": {
+          "name": "堅守陣線",
+          "note": "當敵方隊伍比己方多至少3輛車時"
+        },
+        "staySharp": {
+          "name": "保持警覺",
+          "note": "使用急救箱後的15秒內"
+        },
+        "bulletproof": {
+          "name": "防彈",
+          "note": "當格擋傷害超過本車血量時"
+        },
+        "sideBySide": {
+          "name": "並肩作戰",
+          "note": "距離同類型友方車輛50公尺以內"
+        },
+        "communicationsExpert": {
+          "name": "通訊專家",
+          "note": "當協助傷害超過本車初始血量時"
+        },
+        "recon": {
+          "name": "偵察",
+          "note": "車長技能"
+        },
+        "situationalAwareness": {
+          "name": "態勢感知",
+          "note": "無線電操作員技能"
+        },
+        "threatSearch": {
+          "name": "威脅搜索",
+          "note": "第六感觸發後啟動5秒"
+        },
+        "fieldMod": {
+          "name": "戰地改裝（視野）",
+          "note": "百分比因車輛而異，請在遊戲中確認"
+        },
+        "optics": {
+          "name": "鍍膜光學儀"
+        },
+        "opticsSlot": {
+          "name": "鍍膜光學儀（偵察欄）"
+        },
+        "bountyOptics": {
+          "name": "賞金光學儀"
+        },
+        "bondOptics": {
+          "name": "債券光學儀"
+        },
+        "binocs": {
+          "name": "雙筒望遠鏡",
+          "note": "靜止3秒後生效"
+        },
+        "binocsSlot": {
+          "name": "雙筒望遠鏡（偵察欄）",
+          "note": "靜止3秒後生效"
+        },
+        "bondBinocs": {
+          "name": "債券雙筒望遠鏡",
+          "note": "靜止2秒後生效"
+        },
+        "opticalCalibration": {
+          "name": "指令：光學校準",
+          "note": "需要裝備光學儀。遊戲顯示為2.5%，實測效果為2.3%。"
+        },
+        "irstBase": {
+          "name": "IRST模式（WZ-219）- 基礎",
+          "note": "11階 - 未完全升級，最窄光束"
+        },
+        "irst": {
+          "name": "IRST模式（WZ-219）- 已升級",
+          "note": "11階 - 完全升級，最窄光束"
+        },
+        "cvsNone": {
+          "name": "無車長視覺系統"
+        },
+        "cvsStandard": {
+          "name": "車長視覺系統"
+        },
+        "cvsSlot": {
+          "name": "車長視覺系統（偵察欄）"
+        },
+        "cvsModNone": {
+          "name": "無車長視覺系統改裝"
+        },
+        "panoramicTriplex": {
+          "name": "全景潛望鏡",
+          "note": "僅限部分10階車輛"
+        },
+        "narrowAngle": {
+          "name": "窄角觀察裝置",
+          "note": "僅限部分10階車輛"
+        },
+        "spotBonusFoliage": {
+          "name": "偵察加成：植被",
+          "note": "11階升級"
+        },
+        "spotBonusMovement": {
+          "name": "偵察加成：移動",
+          "note": "11階升級"
+        }
+      }
+    },
+    "ja": {
+      "label": "日本語",
+      "flag": "🇯🇵",
+      "ui": {
+        "title": "World of Tanks 視認範囲・発見距離計算機",
+        "subtitle": "基本車長の主要スキルは100%と仮定しています。",
+        "h_vehicle": "車輌",
+        "h_qual": "車長の主要スキル率",
+        "h_situational": "車長の主要スキル率を上げる状況スキル",
+        "h_flat": "視認範囲への割合ボーナス",
+        "h_skills": "視認範囲を上げる乗員スキル",
+        "h_cvs": "車長用視認システムのボーナス",
+        "h_modes": "車輌モード",
+        "h_conceal": "敵の隠蔽",
+        "l_baseVR": "基本視認範囲（メートル）",
+        "l_camo": "敵車輌の隠蔽値の合計（%）",
+        "l_foliage": "茂み・低木の隠蔽値の合計（%）",
+        "l_combined": "敵の隠蔽値の合計",
+        "l_viewRange": "視認範囲",
+        "l_still": "停止中の敵<br>発見距離",
+        "l_moving": "移動中の敵<br>発見距離",
+        "btn_reset": "下記の選択をすべて解除",
+        "fn_situational": "乗員スキル率はこれらの数値を上昇させますが、視認範囲の計算では、これらのスキルの基本値のみが車長に加算されます。これらのスキルは下記の偵察・状況判断・脅威探索のスキルを強化しません。",
+        "fn_bush": "薄い茂みと濃い茂みがそれぞれ25%と50%の隠蔽を与えると仮定しています。複数の茂みは加算されますが、80%を超えません。",
+        "credit": "制作：RedshiftOTF",
+        "disclaimer1": "本サイトは Wargaming および World of Tanks の公式サイトではありません。すべての画像の権利は次に帰属します：",
+        "disclaimer2": "World of Tanks は次の登録商標です：",
+        "none_vents": "換気装置なし",
+        "none_vision": "光学機器・双眼鏡なし",
+        "none_irst": "IRSTなし",
+        "cvs_total": "合計",
+        "cvs_moving": "移動中の車輌の隠蔽",
+        "cvs_foliage": "茂みに隠れた車輌の隠蔽",
+        "cvs_bonuses": "CVSボーナス",
+        "cvs_shortMoving": "移動中の隠蔽",
+        "cvs_shortFoliage": "茂みでの隠蔽",
+        "cvs_none": "CVSボーナスなし",
+        "cvs_noReduction": "隠蔽の低減なし",
+        "qual_line": "新しい車長の主要スキル率 =",
+        "qual_note": "状況スキルは、視認範囲の計算において車長に固定の（強化されない）割合を与えます",
+        "conceal_line": "新しい敵の隠蔽値  =",
+        "conceal_still": "停止時",
+        "conceal_moving": "移動時",
+        "conceal_against": "対",
+        "conceal_vr": "の視認範囲",
+        "err_base": "基本視認範囲を入力すると結果が表示されます。",
+        "err_camo": "0から100の間の隠蔽値を入力してください。",
+        "eff_moving": "移動",
+        "eff_foliage": "茂み",
+        "eff_viewRange": "視認範囲",
+        "lang_note": "英語以外のテキストはAIによる生成です",
+        "lang_note2": "スキル名や装備名はゲーム内の表記と異なる場合があります"
+      },
+      "items": {
+        "bia": {
+          "name": "戦友の絆",
+          "note": "全乗員を100%まで訓練"
+        },
+        "vents": {
+          "name": "換気装置"
+        },
+        "ventsSlot": {
+          "name": "換気装置（装備スロット）",
+          "note": "装備スロットに搭載"
+        },
+        "bountyVents": {
+          "name": "バウンティ換気装置"
+        },
+        "bondVents": {
+          "name": "ボンド換気装置"
+        },
+        "ventPurge": {
+          "name": "指令：換気パージ",
+          "note": "換気装置が必要"
+        },
+        "food": {
+          "name": "食料消耗品"
+        },
+        "emergency": {
+          "name": "緊急事態",
+          "note": "自車がダメージを受けてから15秒間"
+        },
+        "holdTheLine": {
+          "name": "戦線維持",
+          "note": "敵チームの車輌数が自チームより3輌以上多い間"
+        },
+        "staySharp": {
+          "name": "警戒維持",
+          "note": "応急修理キット使用後15秒間"
+        },
+        "bulletproof": {
+          "name": "防弾",
+          "note": "受け止めたダメージが自車のHPを超えたとき"
+        },
+        "sideBySide": {
+          "name": "並走",
+          "note": "同種の味方車輌から50m以内"
+        },
+        "communicationsExpert": {
+          "name": "通信の専門家",
+          "note": "アシストダメージが自車の初期HPを超えたとき"
+        },
+        "recon": {
+          "name": "偵察",
+          "note": "車長スキル"
+        },
+        "situationalAwareness": {
+          "name": "状況判断",
+          "note": "通信士スキル"
+        },
+        "threatSearch": {
+          "name": "脅威探索",
+          "note": "第六感の発動後5秒間有効"
+        },
+        "fieldMod": {
+          "name": "フィールド改修（視認範囲）",
+          "note": "割合は車輌により異なります - ゲーム内で確認してください"
+        },
+        "optics": {
+          "name": "コーティング光学機器"
+        },
+        "opticsSlot": {
+          "name": "コーティング光学機器（偵察スロット）"
+        },
+        "bountyOptics": {
+          "name": "バウンティ光学機器"
+        },
+        "bondOptics": {
+          "name": "ボンド光学機器"
+        },
+        "binocs": {
+          "name": "双眼鏡",
+          "note": "停車から3秒後に有効"
+        },
+        "binocsSlot": {
+          "name": "双眼鏡（偵察スロット）",
+          "note": "停車から3秒後に有効"
+        },
+        "bondBinocs": {
+          "name": "ボンド双眼鏡",
+          "note": "停車から2秒後に有効"
+        },
+        "opticalCalibration": {
+          "name": "指令：光学機器の調整",
+          "note": "光学機器が必要。ゲーム表示は2.5%ですが、実測値は2.3%です。"
+        },
+        "irstBase": {
+          "name": "IRSTモード（WZ-219）- 基本",
+          "note": "Tier 11 - 未完全強化、最狭ビーム"
+        },
+        "irst": {
+          "name": "IRSTモード（WZ-219）- 強化済み",
+          "note": "Tier 11 - 完全強化、最狭ビーム"
+        },
+        "cvsNone": {
+          "name": "CVSなし"
+        },
+        "cvsStandard": {
+          "name": "車長用視認システム"
+        },
+        "cvsSlot": {
+          "name": "車長用視認システム（偵察スロット）"
+        },
+        "cvsModNone": {
+          "name": "CVSフィールド改修なし"
+        },
+        "panoramicTriplex": {
+          "name": "パノラマ式トリプレックス",
+          "note": "一部のTier 10車輌のみ"
+        },
+        "narrowAngle": {
+          "name": "狭角観測装置",
+          "note": "一部のTier 10車輌のみ"
+        },
+        "spotBonusFoliage": {
+          "name": "偵察ボーナス：茂み",
+          "note": "Tier 11 強化"
+        },
+        "spotBonusMovement": {
+          "name": "偵察ボーナス：移動",
+          "note": "Tier 11 強化"
+        }
+      }
+    }
+  },
   "icons": {
     "bia": "images/bia.png",
     "binocs": "images/binocs.png",
@@ -849,6 +3197,8 @@ const CONFIG = {
 // ---------------------------------------------------------------------------
 
 function init() {
+  buildLangPicker();
+  applyStaticStrings();
   renderBonuses();
   renderConditional();
   renderSkills();
@@ -905,6 +3255,66 @@ function resetSelections() {
 // Vehicle-specific modes. These behave like a view range field mod - an
 // undamped multiplier, not scaled by commander qualification.
 // Optional per-option artwork. Rows without an image are unchanged.
+// ---------------------------------------------------------------------------
+//  Language handling. LANG picks which block of CONFIG.i18n is used; t() looks
+//  up UI strings and localName/localNote translate the data items themselves.
+// ---------------------------------------------------------------------------
+let LANG = 'en';
+
+function t(key, fallback) {
+  const pack = (CONFIG.i18n[LANG] || {}).ui || {};
+  const base = CONFIG.i18n.en.ui || {};
+  if (pack[key] !== undefined) return pack[key];
+  if (base[key] !== undefined) return base[key];
+  return fallback !== undefined ? fallback : key;
+}
+
+function localName(o) {
+  const entry = ((CONFIG.i18n[LANG] || {}).items || {})[o.id];
+  return (entry && entry.name) || o.name;
+}
+
+function localNote(o) {
+  const entry = ((CONFIG.i18n[LANG] || {}).items || {})[o.id];
+  if (entry && entry.note) return entry.note;
+  return LANG === 'en' ? o.note : (o.note || undefined);
+}
+
+function applyStaticStrings() {
+  document.querySelectorAll('[data-t]').forEach(el => {
+    el.innerHTML = t(el.dataset.t);
+  });
+  document.documentElement.lang = LANG;
+  document.title = t('title');
+}
+
+function setLanguage(code) {
+  LANG = CONFIG.i18n[code] ? code : 'en';
+  applyStaticStrings();
+  renderBonuses();
+  renderConditional();
+  renderSkills();
+  renderFlat();
+  renderModes();
+  renderCVS();
+  calculate();
+}
+
+function buildLangPicker() {
+  const sel = document.getElementById('langSelect');
+  if (!sel) return;
+  sel.innerHTML = '';
+  Object.keys(CONFIG.i18n).forEach(code => {
+    const opt = document.createElement('option');
+    opt.value = code;
+    const flag = CONFIG.i18n[code].flag;
+    opt.textContent = (flag ? flag + '  ' : '') + (CONFIG.i18n[code].label || code);
+    sel.appendChild(opt);
+  });
+  sel.value = LANG;
+  sel.addEventListener('change', () => setLanguage(sel.value));
+}
+
 function iconFor(id) {
   const src = (CONFIG.icons || {})[id];
   return src ? `<img class="toggle-icon" src="${src}" alt="">` : '';
@@ -926,9 +3336,9 @@ function renderModes() {
     const label = document.createElement('label');
     label.className = 'toggle';
     const bits = [];
-    if (m.percent) bits.push(`+${m.percent}% view range`);
-    if (m.moving !== undefined && m.moving !== 1) bits.push(`${pct(m.moving)} moving`);
-    if (m.foliage !== undefined && m.foliage !== 1) bits.push(`${pct(m.foliage)} foliage`);
+    if (m.percent) bits.push(`+${m.percent}% ${t('eff_viewRange')}`);
+    if (m.moving !== undefined && m.moving !== 1) bits.push(`${pct(m.moving)} ${t('eff_moving')}`);
+    if (m.foliage !== undefined && m.foliage !== 1) bits.push(`${pct(m.foliage)} ${t('eff_foliage')}`);
     label.innerHTML = `
       <input type="radio" name="vehicleMode" data-mode="${m.id}"
              data-percent="${m.percent || 0}"
@@ -936,14 +3346,14 @@ function renderModes() {
              data-foliage="${m.foliage === undefined ? 1 : m.foliage}"
              ${checked ? 'checked' : ''}>
       ${iconFor(m.id)}
-      <span class="toggle-name">${m.name}${m.note ? `<span class="toggle-note">${m.note}</span>` : ''}</span>
+      <span class="toggle-name">${localName(m)}${localNote(m) ? `<span class="toggle-note">${localNote(m)}</span>` : ''}</span>
       <span class="toggle-val">${bits.join('<br>')}</span>`;
     label.querySelector('input').addEventListener('change', calculate);
     return label;
   };
 
   set.appendChild(row({ id: 'modeNone',
-    name: CONFIG.combinedModeGroupLabel || 'No vehicle mode' }, true));
+    name: t('none_irst') }, true));
   CONFIG.combinedModes.forEach(m => set.appendChild(row(m, false)));
   box.appendChild(set);
 }
@@ -970,14 +3380,14 @@ function renderCVS() {
       const row = document.createElement('label');
       row.className = 'toggle';
       const effect = (o.moving !== 1 || o.foliage !== 1)
-        ? `${label(o.moving, 'moving')} &amp; ${label(o.foliage, 'foliage')}`
+        ? `${label(o.moving, t('eff_moving'))} &amp; ${label(o.foliage, t('eff_foliage'))}`
         : '';
       row.innerHTML = `
         <input type="radio" name="${groupName}" data-cvs="${o.id}"
                data-moving="${o.moving}" data-foliage="${o.foliage}"
                ${i === 0 ? 'checked' : ''}>
         ${iconFor(o.id)}
-        <span class="toggle-name">${o.name}${o.note ? `<span class="toggle-note">${o.note}</span>` : ''}</span>
+        <span class="toggle-name">${localName(o)}${localNote(o) ? `<span class="toggle-note">${localNote(o)}</span>` : ''}</span>
         <span class="toggle-val">${effect}</span>`;
       row.querySelector('input').addEventListener('change', () => {
         // Field mods and tier 11 upgrades are alternatives, so picking a real
@@ -1010,14 +3420,14 @@ function renderCVS() {
       const row = document.createElement('label');
       row.className = 'toggle';
       const parts = [];
-      if (o.moving !== 1) parts.push(label(o.moving, 'moving'));
-      if (o.foliage !== 1) parts.push(label(o.foliage, 'foliage'));
+      if (o.moving !== 1) parts.push(label(o.moving, t('eff_moving')));
+      if (o.foliage !== 1) parts.push(label(o.foliage, t('eff_foliage')));
       const effect = parts.join(' &amp; ');
       row.innerHTML = `
         <input type="checkbox" data-cvs-upgrade="${o.id}"
                data-moving="${o.moving}" data-foliage="${o.foliage}">
         ${iconFor(o.id)}
-        <span class="toggle-name">${o.name}${o.note ? `<span class="toggle-note">${o.note}</span>` : ''}</span>
+        <span class="toggle-name">${localName(o)}${localNote(o) ? `<span class="toggle-note">${localNote(o)}</span>` : ''}</span>
         <span class="toggle-val">${effect}</span>`;
       row.querySelector('input').addEventListener('change', e => {
         // Ticking an upgrade drops any field mod back to "none".
@@ -1082,7 +3492,7 @@ function calculateSpotting(vr) {
     move.textContent = '\u2014';
     const box = document.getElementById('camoTotal');
     if (box) box.textContent = '\u2014';
-    bd.innerHTML = '<span class="msg">Enter camouflage values between 0 and 100.</span>';
+    bd.innerHTML = `<span class="msg">${t('err_camo')}</span>`;
     return;
   }
 
@@ -1117,9 +3527,9 @@ function calculateSpotting(vr) {
   const totalBox = document.getElementById('cvsTotal');
   if (totalBox) {
     totalBox.innerHTML = none
-      ? 'No concealment reduction'
-      : `Total ${pc(mMul, 'camo from moving vehicles')} \u00b7 `
-        + `${pc(fMul, 'camo from vehicles behind foliage')}`;
+      ? t('cvs_noReduction')
+      : `${t('cvs_total')} ${pc(mMul, t('cvs_moving'))} \u00b7 `
+        + `${pc(fMul, t('cvs_foliage'))}`;
   }
 
   // Repeat the CVS totals on the view range panel so both halves of the
@@ -1127,8 +3537,8 @@ function calculateSpotting(vr) {
   const cvsSummary = document.getElementById('cvsSummary');
   if (cvsSummary) {
     cvsSummary.innerHTML = none
-      ? 'No CVS bonuses'
-      : `CVS bonuses ${pc(mMul, 'camo moving')} \u00b7 ${pc(fMul, 'camo behind foliage')}`;
+      ? t('cvs_none')
+      : `${t('cvs_bonuses')} ${pc(mMul, t('cvs_shortMoving'))} \u00b7 ${pc(fMul, t('cvs_shortFoliage'))}`;
   }
 
   const foliageEff = foliage * fMul;
@@ -1155,9 +3565,9 @@ function calculateSpotting(vr) {
   render(still, a);
   render(move, b);
 
-  bd.innerHTML = `New Enemy Concealment  = <b>${+totalStill.toFixed(2)}%</b> stationary &amp; `
-               + `<b>${+totalMove.toFixed(2)}%</b> moving`
-               + ` \u00b7 against <b>${vr.toFixed(2)} m</b> view range`;
+  bd.innerHTML = `${t('conceal_line')} <b>${+totalStill.toFixed(2)}%</b> ${t('conceal_still')} &amp; `
+               + `<b>${+totalMove.toFixed(2)}%</b> ${t('conceal_moving')}`
+               + ` \u00b7 ${t('conceal_against')} <b>${vr.toFixed(2)} m</b> ${t('conceal_vr')}`;
 }
 
 function renderConditional() {
@@ -1169,7 +3579,7 @@ function renderConditional() {
     label.innerHTML = `
       <input type="checkbox" data-cond="${s.id}" data-percent="${s.percent}">
       ${iconFor(s.id)}
-      <span class="toggle-name">${s.name}${s.note ? `<span class="toggle-note">${s.note}</span>` : ''}</span>
+      <span class="toggle-name">${localName(s)}${localNote(s) ? `<span class="toggle-note">${localNote(s)}</span>` : ''}</span>
       <span class="toggle-val" data-cond-val="${s.id}">+${s.percent}</span>`;
     label.querySelector('input').addEventListener('change', calculate);
     box.appendChild(label);
@@ -1178,7 +3588,7 @@ function renderConditional() {
   if (CONFIG.conditionalFootnote) {
     const note = document.createElement('p');
     note.className = 'footnote';
-    note.textContent = CONFIG.conditionalFootnote;
+    note.textContent = t('fn_situational');
     box.appendChild(note);
   }
 }
@@ -1192,7 +3602,7 @@ function renderSkills() {
     label.innerHTML = `
       <input type="checkbox" data-skill="${s.id}" data-percent="${s.percent}">
       ${iconFor(s.id)}
-      <span class="toggle-name">${s.name}${s.note ? `<span class="toggle-note">${s.note}</span>` : ''}</span>
+      <span class="toggle-name">${localName(s)}${localNote(s) ? `<span class="toggle-note">${localNote(s)}</span>` : ''}</span>
       <span class="toggle-val" data-skill-val="${s.id}">+${s.percent}%</span>`;
     label.querySelector('input').addEventListener('change', calculate);
     box.appendChild(label);
@@ -1211,7 +3621,7 @@ function renderFlat() {
              ${b.slot ? `data-slot="${b.slot}"` : ''}
              ${groupName ? `name="flat-${groupName}"` : ''} ${checked ? 'checked' : ''}>
       ${iconFor(b.id)}
-      <span class="toggle-name">${b.name}${b.note ? `<span class="toggle-note">${b.note}</span>` : ''}</span>
+      <span class="toggle-name">${localName(b)}${localNote(b) ? `<span class="toggle-note">${localNote(b)}</span>` : ''}</span>
       ${b.userEditable
         ? `<span class="pct"><input type="number" class="pct-input" value="${b.percent}"
              min="0" step="0.1" inputmode="decimal" aria-label="${b.name} percentage" disabled>%</span>`
@@ -1252,7 +3662,8 @@ function renderFlat() {
     const group = CONFIG.flatBonuses.filter(x => x.exclusiveGroup === b.exclusiveGroup);
     const set = document.createElement('div');
     set.className = 'group';
-    const noneLabel = (CONFIG.groupLabels && CONFIG.groupLabels[b.exclusiveGroup])
+    const noneLabel = t('none_' + b.exclusiveGroup)
+      || (CONFIG.groupLabels && CONFIG.groupLabels[b.exclusiveGroup])
       || ('No ' + b.exclusiveGroup);
     set.appendChild(makeRow(
       { id: b.exclusiveGroup + '-none', name: noneLabel, percent: 0 },
@@ -1277,7 +3688,7 @@ function renderBonuses() {
              ${b.slot ? `data-slot="${b.slot}"` : ''}
              ${groupName ? `name="${groupName}"` : ''} ${checked ? 'checked' : ''}>
       ${iconFor(b.id)}
-      <span class="toggle-name">${b.name}${b.note ? `<span class="toggle-note">${b.note}</span>` : ''}</span>
+      <span class="toggle-name">${localName(b)}${localNote(b) ? `<span class="toggle-note">${localNote(b)}</span>` : ''}</span>
       <span class="toggle-val">${b.value ? '+' + b.value : ''}</span>`;
     const control = label.querySelector('input');
     control.addEventListener('change', () => { clearSlotConflicts(control); calculate(); });
@@ -1303,7 +3714,8 @@ function renderBonuses() {
     const set = document.createElement('div');
     set.className = 'group';
     set.appendChild(makeRow(
-      { id: b.exclusiveGroup + '-none', name: 'No ' + b.exclusiveGroup, value: 0 },
+      { id: b.exclusiveGroup + '-none',
+        name: t('none_' + b.exclusiveGroup) || ('No ' + b.exclusiveGroup), value: 0 },
       'radio', b.exclusiveGroup, true));
     group.forEach(g => {
       done.add(g.id);
@@ -1320,7 +3732,7 @@ function calculate() {
   if (!isFinite(base) || base <= 0) {
     out.textContent = '—';
     const note = document.getElementById('cvsSummary');
-    if (note) note.innerHTML = '<span class="msg">Enter a base view range to see a result.</span>';
+    if (note) note.innerHTML = `<span class="msg">${t('err_base')}</span>`;
     return;
   }
 
@@ -1429,9 +3841,8 @@ function calculate() {
   // the situational skills have all been added in.
   const qualBox = document.getElementById('qualSummary');
   if (qualBox) {
-    qualBox.innerHTML = `New Commander Qualification = <b>${+C.toFixed(3)}%</b>`
-      + `<br><span class="qual-note">Situational skills give a flat unboosted `
-      + `percentage to commander for view range purposes</span>`;
+    qualBox.innerHTML = `${t('qual_line')} <b>${+C.toFixed(3)}%</b>`
+      + `<br><span class="qual-note">${t('qual_note')}</span>`;
   }
 
   calculateSpotting(vr);
