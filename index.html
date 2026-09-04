@@ -595,7 +595,7 @@
     </div>
   </div>
 
-  <p class="credit"><span data-t="credit">Made by RedshiftOTF</span><br>v1.2</p>
+  <p class="credit"><span data-t="credit">Made by RedshiftOTF</span><br>v1.2.1</p>
 
   <p class="disclaimer"><span data-t="disclaimer1">This is not an official Wargaming or World of Tanks website.
     All images belong to</span> <a href="https://Wargaming.net" target="_blank" rel="noopener">Wargaming.net</a><br>
@@ -877,23 +877,23 @@ const CONFIG = {
     {
       "id": "irstBase",
       "name": "IRST mode (WZ-219) - Base",
-      "percent": 26,
       "moving": 0.855,
       "foliage": 0.65,
       "note": "Tier 11 - not fully upgraded, narrowest beam",
-      "slot": "irstMode"
+      "slot": "irstMode",
+      "flat": 106.6
     },
     {
       "id": "irst",
       "name": "IRST mode (WZ-219) - Upgraded",
-      "percent": 30,
       "moving": 0.825,
       "foliage": 0.6,
       "note": "Tier 11 - fully upgraded, narrowest beam",
-      "slot": "irstMode"
+      "slot": "irstMode",
+      "flat": 123
     }
   ],
-  "_combinedModeNote": "Vehicle modes that act on both sides of the calculation at once: a view range multiplier like a field mod, plus CVS-style concealment reduction. UNVERIFIED against the game.",
+  "_combinedModeNote": "Vehicle modes that act on both sides of the calculation: a FLAT view range addition in metres applied after every other bonus, plus CVS-style concealment reduction. The game states +123 m for the fully upgraded IRST; the base value is derived from the upgrade's stated '4% more view range' and is NOT confirmed.",
   "combinedModeGroupLabel": "No IRST",
   "i18n": {
     "en": {
@@ -947,7 +947,8 @@ const CONFIG = {
         "eff_foliage": "foliage",
         "eff_viewRange": "view range",
         "lang_note": "Text other than English is AI generated",
-        "lang_note2": "Skill and Equipment names may differ from in game descriptions"
+        "lang_note2": "Skill and Equipment names may differ from in game descriptions",
+        "fn_modes": "It is now inferred that the upgraded IRST adds a flat +123m view range after all other bonuses are calculated, not an extra percentage added in the same way that equipment and crew skill percentages give."
       },
       "flag": "🇬🇧 🇺🇸"
     },
@@ -1131,7 +1132,8 @@ const CONFIG = {
         "eff_foliage": "feuillage",
         "eff_viewRange": "de portée de vue",
         "lang_note": "Les textes autres qu'en anglais sont générés par IA",
-        "lang_note2": "Les noms des compétences et des équipements peuvent différer de ceux du jeu"
+        "lang_note2": "Les noms des compétences et des équipements peuvent différer de ceux du jeu",
+        "fn_modes": "On en déduit désormais que l'IRST amélioré ajoute un bonus fixe de +123 m de portée de vue une fois tous les autres bonus calculés, et non un pourcentage supplémentaire appliqué comme le font les équipements et les compétences d'équipage."
       },
       "flag": "🇫🇷"
     },
@@ -1186,7 +1188,8 @@ const CONFIG = {
         "eff_foliage": "Laub",
         "eff_viewRange": "Sichtweite",
         "lang_note": "Texte außer Englisch sind KI-generiert",
-        "lang_note2": "Namen von Fähigkeiten und Ausrüstung können von den Bezeichnungen im Spiel abweichen"
+        "lang_note2": "Namen von Fähigkeiten und Ausrüstung können von den Bezeichnungen im Spiel abweichen",
+        "fn_modes": "Es wird nun angenommen, dass das ausgebaute IRST einen festen Bonus von +123 m Sichtweite gewährt, nachdem alle anderen Boni berechnet wurden - und keinen zusätzlichen Prozentsatz, wie ihn Ausrüstung und Besatzungsfähigkeiten geben."
       },
       "items": {
         "bia": {
@@ -1370,7 +1373,8 @@ const CONFIG = {
         "eff_foliage": "follaje",
         "eff_viewRange": "de alcance de visión",
         "lang_note": "Los textos que no están en inglés han sido generados por IA",
-        "lang_note2": "Los nombres de habilidades y equipamiento pueden diferir de los del juego"
+        "lang_note2": "Los nombres de habilidades y equipamiento pueden diferir de los del juego",
+        "fn_modes": "Ahora se deduce que el IRST mejorado añade un bono fijo de +123 m de alcance de visión después de calcular todas las demás bonificaciones, y no un porcentaje adicional como el que dan el equipamiento y las habilidades de la tripulación."
       },
       "items": {
         "bia": {
@@ -1554,7 +1558,8 @@ const CONFIG = {
         "eff_foliage": "folhagem",
         "eff_viewRange": "de alcance de visão",
         "lang_note": "Os textos que não estão em inglês foram gerados por IA",
-        "lang_note2": "Os nomes de habilidades e equipamento podem diferir dos do jogo"
+        "lang_note2": "Os nomes de habilidades e equipamento podem diferir dos do jogo",
+        "fn_modes": "Deduz-se agora que o IRST melhorado adiciona um bónus fixo de +123 m de alcance de visão depois de calculados todos os outros bónus, e não uma percentagem adicional como a dada pelo equipamento e pelas habilidades da tripulação."
       },
       "items": {
         "bia": {
@@ -1738,7 +1743,8 @@ const CONFIG = {
         "eff_foliage": "listowie",
         "eff_viewRange": "zasięgu widzenia",
         "lang_note": "Teksty inne niż angielskie zostały wygenerowane przez SI",
-        "lang_note2": "Nazwy umiejętności i wyposażenia mogą różnić się od tych w grze"
+        "lang_note2": "Nazwy umiejętności i wyposażenia mogą różnić się od tych w grze",
+        "fn_modes": "Obecnie przyjmuje się, że ulepszony IRST dodaje stałe +123 m zasięgu widzenia po obliczeniu wszystkich pozostałych premii, a nie dodatkowy procent, jak w przypadku wyposażenia i umiejętności załogi."
       },
       "items": {
         "bia": {
@@ -1922,7 +1928,8 @@ const CONFIG = {
         "eff_foliage": "fogliame",
         "eff_viewRange": "di raggio visivo",
         "lang_note": "I testi diversi dall'inglese sono generati dall'IA",
-        "lang_note2": "I nomi di abilità ed equipaggiamento possono differire da quelli del gioco"
+        "lang_note2": "I nomi di abilità ed equipaggiamento possono differire da quelli del gioco",
+        "fn_modes": "Si deduce ora che l'IRST potenziato aggiunge un bonus fisso di +123 m di raggio visivo dopo il calcolo di tutti gli altri bonus, e non una percentuale aggiuntiva come quella data da equipaggiamento e abilità dell'equipaggio."
       },
       "items": {
         "bia": {
@@ -2106,7 +2113,8 @@ const CONFIG = {
         "eff_foliage": "listoví",
         "eff_viewRange": "výhledu",
         "lang_note": "Texty jiné než anglické jsou generovány umělou inteligencí",
-        "lang_note2": "Názvy dovedností a vybavení se mohou lišit od názvů ve hře"
+        "lang_note2": "Názvy dovedností a vybavení se mohou lišit od názvů ve hře",
+        "fn_modes": "Nyní se předpokládá, že vylepšený IRST přidává pevných +123 m výhledu po výpočtu všech ostatních bonusů, nikoli další procento, jako je tomu u vybavení a dovedností posádky."
       },
       "items": {
         "bia": {
@@ -2290,7 +2298,8 @@ const CONFIG = {
         "eff_foliage": "листя",
         "eff_viewRange": "огляду",
         "lang_note": "Тексти, відмінні від англійської, згенеровані ШІ",
-        "lang_note2": "Назви навичок та обладнання можуть відрізнятися від ігрових"
+        "lang_note2": "Назви навичок та обладнання можуть відрізнятися від ігрових",
+        "fn_modes": "Наразі припускається, що покращений IRST додає фіксовані +123 м огляду після розрахунку всіх інших бонусів, а не додатковий відсоток, як це роблять обладнання та навички екіпажу."
       },
       "items": {
         "bia": {
@@ -2474,7 +2483,8 @@ const CONFIG = {
         "eff_foliage": "lombozat",
         "eff_viewRange": "látótávolság",
         "lang_note": "Az angoltól eltérő szövegeket mesterséges intelligencia hozta létre",
-        "lang_note2": "A képességek és felszerelések nevei eltérhetnek a játékban láthatóaktól"
+        "lang_note2": "A képességek és felszerelések nevei eltérhetnek a játékban láthatóaktól",
+        "fn_modes": "Jelenleg úgy tűnik, hogy a fejlesztett IRST fix +123 m látótávolságot ad az összes többi bónusz kiszámítása után, nem pedig további százalékot, ahogy a felszerelések és a személyzeti képességek adnak."
       },
       "items": {
         "bia": {
@@ -2658,7 +2668,8 @@ const CONFIG = {
         "eff_foliage": "植被",
         "eff_viewRange": "视野",
         "lang_note": "非英语文本由人工智能生成",
-        "lang_note2": "技能与装备名称可能与游戏内的描述不同"
+        "lang_note2": "技能与装备名称可能与游戏内的描述不同",
+        "fn_modes": "现在推断，升级版IRST是在计算完所有其他加成之后，直接增加固定的+123米视野，而不是像装备和乘员技能那样以百分比方式叠加。"
       },
       "items": {
         "bia": {
@@ -2842,7 +2853,8 @@ const CONFIG = {
         "eff_foliage": "植被",
         "eff_viewRange": "視野",
         "lang_note": "非英語文本由人工智慧生成",
-        "lang_note2": "技能與裝備名稱可能與遊戲內的描述不同"
+        "lang_note2": "技能與裝備名稱可能與遊戲內的描述不同",
+        "fn_modes": "現在推斷，升級版IRST是在計算完所有其他加成之後，直接增加固定的+123公尺視野，而不是像裝備和乘員技能那樣以百分比方式疊加。"
       },
       "items": {
         "bia": {
@@ -3026,7 +3038,8 @@ const CONFIG = {
         "eff_foliage": "茂み",
         "eff_viewRange": "視認範囲",
         "lang_note": "英語以外のテキストはAIによる生成です",
-        "lang_note2": "スキル名や装備名はゲーム内の表記と異なる場合があります"
+        "lang_note2": "スキル名や装備名はゲーム内の表記と異なる場合があります",
+        "fn_modes": "現在の推定では、強化済みIRSTは他のすべてのボーナスを計算した後に視認範囲へ固定で+123mを加算するものであり、装備や乗員スキルのように割合で加算されるものではありません。"
       },
       "items": {
         "bia": {
@@ -3336,12 +3349,12 @@ function renderModes() {
     const label = document.createElement('label');
     label.className = 'toggle';
     const bits = [];
-    if (m.percent) bits.push(`+${m.percent}% ${t('eff_viewRange')}`);
+    if (m.flat) bits.push(`+${m.flat} m ${t('eff_viewRange')}`);
     if (m.moving !== undefined && m.moving !== 1) bits.push(`${pct(m.moving)} ${t('eff_moving')}`);
     if (m.foliage !== undefined && m.foliage !== 1) bits.push(`${pct(m.foliage)} ${t('eff_foliage')}`);
     label.innerHTML = `
       <input type="radio" name="vehicleMode" data-mode="${m.id}"
-             data-percent="${m.percent || 0}"
+             data-flat="${m.flat || 0}"
              data-moving="${m.moving === undefined ? 1 : m.moving}"
              data-foliage="${m.foliage === undefined ? 1 : m.foliage}"
              ${checked ? 'checked' : ''}>
@@ -3356,6 +3369,11 @@ function renderModes() {
     name: t('none_irst') }, true));
   CONFIG.combinedModes.forEach(m => set.appendChild(row(m, false)));
   box.appendChild(set);
+
+  const note = document.createElement('p');
+  note.className = 'footnote';
+  note.textContent = t('fn_modes');
+  box.appendChild(note);
 }
 
 function renderCVS() {
@@ -3824,13 +3842,11 @@ function calculate() {
     }
   });
 
-  // Vehicle modes multiply like the flat bonuses, undamped.
+  // Vehicle modes add a flat number of metres AFTER every other bonus, so
+  // they do not scale with the rest of the build.
   document.querySelectorAll('#combinedModes input:checked').forEach(chk => {
-    const p = parseFloat(chk.dataset.percent);
-    if (isFinite(p) && p !== 0) {
-      vr *= (1 + p / 100);
-      flats.push(p);
-    }
+    const extra = parseFloat(chk.dataset.flat);
+    if (isFinite(extra) && extra !== 0) vr += extra;
   });
 
   const gain = vr - base;
